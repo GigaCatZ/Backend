@@ -6,7 +6,11 @@ name = "pypi"
 [packages]
 flask = "*"
 flask-login = "*"
+<<<<<<< HEAD
+pylint = "*"
+=======
 bcrypt = "*"
+>>>>>>> 88fa66b6836a54bb960d218227a2f73c75164209
 
 [dev-packages]
 
