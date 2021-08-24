@@ -1,5 +1,5 @@
 PIPENV=pipenv
-PYLIB=flask flask-login pylint
+PYLIB=flask flask-login pylint bcrypt
 
 all: install run_env
 
