@@ -11,5 +11,5 @@ run_env:
 	$(PIPENV) shell
 
 run:
-	FLASK_APP=app flask run
+	FLASK_APP=src/app flask run
 
