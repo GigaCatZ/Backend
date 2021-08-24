@@ -1,5 +1,5 @@
 PIPENV=pipenv
-PYLIB=flask
+PYLIB=flask flask-login
 
 all: install run_env
 
@@ -11,5 +11,5 @@ run_env:
 	$(PIPENV) shell
 
 run:
-	FLASK_APP=app flask run
+	FLASK_APP=src/app flask run
 
