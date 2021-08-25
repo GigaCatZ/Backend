@@ -2,16 +2,8 @@ from flask import Flask, session, request, jsonify
 from flask_login import LoginManager, login_user, logout_user, UserMixin
 import bcrypt
 from flask_login.utils import login_required
+from .modules import *
 
-
-class User:
-    def __init__(self, username, password,email) -> None:
-        self.username = username
-        self.password = password
-        self.email = email
-
-    def __repr__(self):
-        return f'<User: {self.username}>'
 
 class Flask_login_User(UserMixin):
     pass
