@@ -9,7 +9,7 @@ class Users(db.Model):
     sky_username = db.Column(db.String(20), nullable=False, unique=True)
     username = db.Column(db.String(20), nullable=False, unique=True)
     encrypted_password = db.Column(db.String(100), nullable=False)
-    mod = db.Column(db.Boolean, nullable=False)
+    mod = db.Column(db.Boolean, default=False)
     
 
 class Thread(db.Model):

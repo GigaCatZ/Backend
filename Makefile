@@ -1,7 +1,7 @@
 PIPENV=pipenv
-PYLIB=flask PyMySQL flask_sqlalchemy
+PYLIB=flask PyMySQL flask_sqlalchemy flask-login bcrypt
 
-all: install run_env
+all: clean install run_env
 
 install:
 	$(PIPENV) --python 3.9
@@ -11,5 +11,8 @@ run_env:
 	$(PIPENV) shell
 
 run:
-	FLASK_APP=app flask run
+	FLASK_APP=src/app flask run
+
+clean:
+	rm -rf Pipfile Pipfile.lock
 

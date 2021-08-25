@@ -1,35 +1,47 @@
 from flask import current_app as app
-from flask import (render_template, request, jsonify)
-from flask.helpers import make_response
-from .models import (Thread, db)
-from .models import (Users, db)
-from datetime import datetime as dt
+
+from flask import Flask, session, request, jsonify
+from flask_login import LoginManager, login_user, logout_user, UserMixin
+import bcrypt
+from flask_login.utils import login_required
+
+import os
+
+from .query import read_queries
 
 
 # THIS IS A DUMMY THING COPIED FROM AJ KANAT
 
-@app.route('/threads', methods=['POST'])
-def create_message():
-    required_fields = set(['author', 'message'])
-    data = request.get_json()
-    if not data or not (required_fields <= data.keys()):
-        print(data, required_fields)
-        return make_response(jsonify({'status': 'Bad Request'}), 400)
-    author, message = data.get('author'), data.get('message')
-    new_post = Thread(question=message, timestamp=dt.now(), dupes=1)
-    db.session.add(new_post)
-    db.session.commit()
-    return jsonify({"status": "OK"})
 
-@app.route('/threads')
-def list_messages():
-    results = Thread.query.all()  # user .filter to scope it down (like a WHERE clause)
-    # .all() everything matching this ..vs .first() only the first entry
+@app.route('/login', methods=['GET'])
+def get_login():
+    return '''
+               <form action='login' method='POST'>
+                <input type='text' name='username' id='username' placeholder='username'/>
+                <input type='password' name='password' id='password' placeholder='password'/>
+                <input type='submit' name='submit'/>
+               </form>
+            '''
 
-    if request.args.get('pretty') == 'true':
-        return render_template('display.html', messages=results)
+@app.route('/api/login', methods=['POST'])
+def login():
+    username = request.form.get('username')
+    password = request.form.get('password')
+    
+    if (username != None and password != None):
+        passwordToByte = str.encode(password)
 
-    messages = "<br />".join(
-        repr((m.id, m.user_id, m.question, m.timestamp, m.dupes)) for m in results
-    )
-    return messages
+        encrypted_password = read_queries.get_encrypted_password(username)
+
+        if (encrypted_password != None):
+            # only uncomment when testing (in case we manually add password without encrypt lol)
+            # encrypted_password = bcrypt.hashpw(str.encode(encrypted_password), bcrypt.gensalt(10))
+            if (bcrypt.checkpw(passwordToByte, encrypted_password)):
+                # change to Flask soon
+                # current_user = Flask_login_User()
+                # current_user.username = username
+                # login_user(current_user)
+                session['username'] = username
+                return jsonify(username=username, status=True, message="Login successfully")
+    return jsonify(username="", status=False, message="Can not login")
+
