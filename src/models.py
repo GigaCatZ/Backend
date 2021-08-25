@@ -6,7 +6,7 @@ class Users(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    student_id = db.Column(db.String(20), nullable=False, unique=True)
+    sky_username = db.Column(db.String(20), nullable=False, unique=True)
     username = db.Column(db.String(20), nullable=False, unique=True)
     encrypted_password = db.Column(db.String(100), nullable=False)
     mod = db.Column(db.Boolean, nullable=False)
@@ -25,13 +25,21 @@ class Thread(db.Model):
 
 
 class TagLine(db.Model):
-    """Data model for Thread"""
+    """Data model for TagLine"""
 
     __tablename__ = 'tag_line'
     
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     thread_id = db.Column(db.Integer, db.ForeignKey('thread.id'), nullable=False)
-    tag = db.Column(db.String(25))
+    tag = db.Column(db.String(25), db.ForeignKey('tag.id'), nullable=False)
+
+
+class Tag(db.Model):
+    """Data model for Tags"""
+
+    __tablename__ = 'tag'
+    
+    id = db.Column(db.String(25), primary_key=True)
 
 
 class Comment(db.Model):

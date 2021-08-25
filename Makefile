@@ -1,5 +1,5 @@
 PIPENV=pipenv
-PYLIB=flask
+PYLIB=flask PyMySQL flask_sqlalchemy
 
 all: install run_env
 
