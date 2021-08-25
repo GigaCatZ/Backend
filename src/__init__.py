@@ -17,3 +17,4 @@ def create_app(test_config):
         db.create_all() # Create database tables if not already there!
 
         return app
+

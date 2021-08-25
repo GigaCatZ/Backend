@@ -10,12 +10,13 @@ from datetime import datetime as dt
 
 @app.route('/threads', methods=['POST'])
 def create_message():
-    data: dict = request.get_json()
     required_fields = set(['author', 'message'])
+    data = request.get_json()
     if not data or not (required_fields <= data.keys()):
+        print(data, required_fields)
         return make_response(jsonify({'status': 'Bad Request'}), 400)
     author, message = data.get('author'), data.get('message')
-    new_post = Thread(author=Users.query.filter_by(id=author).first().username, question=message, timestamp=dt.now())
+    new_post = Thread(question=message, timestamp=dt.now(), dupes=1)
     db.session.add(new_post)
     db.session.commit()
     return jsonify({"status": "OK"})
@@ -29,6 +30,6 @@ def list_messages():
         return render_template('display.html', messages=results)
 
     messages = "<br />".join(
-        repr((m.message_id, m.author, m.message, m.timestamp)) for m in results
+        repr((m.id, m.user_id, m.question, m.timestamp, m.dupes)) for m in results
     )
     return messages

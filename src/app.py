@@ -1,7 +1,8 @@
-# from flask import Flask
+from flask import Flask
 
-# app = Flask(__name__)
+app = Flask(__name__)
 
+db.init_app(app)
 
 @app.route('/')
 def hello_world():  # put application's code here
