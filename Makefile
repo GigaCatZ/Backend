@@ -6,4 +6,4 @@ init:
 	$(PIPENV) install $(PYLIB)
 
 run:
-	FLASK_APP=src/app flask run
+	FLASK_APP=src/__init__ flask run

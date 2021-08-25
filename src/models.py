@@ -1,6 +1,7 @@
 from . import db # db comes from __init__.py
+from flask_login import UserMixin
 
-class Users(db.Model):
+class Users(UserMixin, db.Model):
     """DUMMY Data model for Users"""
 
     __tablename__ = 'users'
