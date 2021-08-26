@@ -7,4 +7,6 @@
 # Editor-based HTTP Client requests
 .idea/httpRequests/
 .DS_Store
+**/.DS_Store
 __pycache__
+.Makefile.swp
