@@ -1,9 +1,10 @@
 from flask import current_app as app
 
 from flask import request, jsonify
-from flask_login import LoginManager, login_user, logout_user
+from flask_login import LoginManager, login_user, logout_user, current_user
 import bcrypt
 from flask_login.utils import login_required
+from sqlalchemy.exc import IntegrityError
 from .models import Users
 
 
@@ -57,21 +58,33 @@ def register():
     username = request.form.get('username')
     password = request.form.get('password')
     sky_user = request.form.get('sky_username')
-    email = request.form.get('email')
+    mod = request.form.get('mod')
 
-    if (username != None and password != None and sky_user != None and email != None):
-        write_queries.register_client(sky_user,username,password, email)
-        return jsonify(username=username, status=True)
-    return jsonify(username=username, status=False)
+    if (username != None and password != None and sky_user != None):
+        if mod == None:
+            mod = False
+        try:
+            write_queries.register_client(sky_user,username,password, mod)
+        except (IntegrityError):
+            return jsonify(username=username, status=False, message="Username or sky username are alreaady taken")
+        return jsonify(username=username, status=True, message="Register succesfully")
+    return jsonify(username=username, status=False, message="Username password and sky username not be empty")
     
 
 @app.route('/api/logout', methods=['GET'])
-@login_required
 def logout():
+    user = None
+    try:
+        user = current_user.username
+    except (AttributeError):
+        return jsonify(status=False, username="", message="User hasnt logged in yet")
     logout_user()
-    return jsonify(status=True)
+    return jsonify(status=True, username=user, message="Logout successfully")
 
-# @app.route('/api/test', methods=['GET'])
-# def test():
-    # return "Login as " + str(current_user)
+@app.route('/api/test', methods=['GET'])
+def test():
+    try:
+        return "Login as " + str(current_user.username)
+    except (AttributeError):
+        return "Not login yet"
 

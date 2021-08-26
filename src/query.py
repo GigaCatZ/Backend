@@ -9,7 +9,7 @@ class ReadOnly:
         return user.first().encrypted_password if user is not None and user.first() is not None else None
 
 class WriteOnly:
-    def register_client(self,sky_username, username, password, email) -> None:
+    def register_client(self,sky_username, username, password, mod) -> None:
         passwordToByte = str.encode(password)
         hash_password = bcrypt.hashpw(passwordToByte, bcrypt.gensalt(10)) 
         # new_user = Users(sky_username,username,hash_password,email)
@@ -17,7 +17,7 @@ class WriteOnly:
         test.sky_username = sky_username
         test.username = username
         test.encrypted_password = hash_password
-        test.email = email
+        test.mod = mod
         db.session.add(test)
         db.session.commit()
 
