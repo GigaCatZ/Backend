@@ -66,9 +66,9 @@ def register():
         try:
             write_queries.register_client(sky_user,username,password, mod)
         except (IntegrityError):
-            return jsonify(username=username, status=False, message="Username or sky username are alreaady taken")
-        return jsonify(username=username, status=True, message="Register succesfully")
-    return jsonify(username=username, status=False, message="Username password and sky username not be empty")
+            return jsonify(username=username, status=False, message="Username or sky username already taken")
+        return jsonify(username=username, status=True, message="Register successfully")
+    return jsonify(username=username, status=False, message="Username, password and sky username cannot be empty")
     
 
 @app.route('/api/logout', methods=['GET','POST'])
