@@ -23,8 +23,8 @@ class WriteOnly:
         db.session.commit()
 
     # Thread attempt begins here
-    def new_thread(self, thread_title, user_id, thread_body):
-        
+    def add_thread(self, thread_title, user_id, thread_body):
+        """ Function to create a new thread """ 
         thread = Thread()
         thread.question = thread_title
         thread.body = thread_body
@@ -34,6 +34,22 @@ class WriteOnly:
         # Not sure if this is the way to do it
         db.session.add(thread)
         db.session.commit()
+       
+    # If we allow threads to be deleted (probably not the way to do it)   
+    def delete_thread(self, thread_id):
+        thread = Thread.query.filter(Thread.id == thread_id)
+        db.session.delete(thread) # Can we do this?!
+        db.session.commit()
+    
+    def edit_thread(self, thread_id, new_title, new_body):
+        thread = Thread.query.filter(Thread.id == thread_id)
+
+        # Even if the title or body is unchanged, it'll get "updated" with the old value
+        thread.question = new_title
+        thread.body = new_body
+        db.session.commit()
+    
+
 
 read_queries = ReadOnly()
 write_queries = WriteOnly()

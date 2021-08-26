@@ -5,7 +5,7 @@ from flask_login import LoginManager, login_user, logout_user
 import bcrypt
 from flask_login.utils import login_required
 from .models import Users
-
+from .models import Thread
 
 from .query import read_queries, write_queries
 
@@ -74,11 +74,14 @@ def logout():
 # Thread attempt begins here
 @app.route('/threads/new_thread', methods=['POST'])
 def create_thread():
+    """ Route/function to create a new thread """
 
     # I assume we will be getting the thread information from the form they submit
     question_title = request.form.get('title')
     question_body = request.form.get('question-body')
-    user_id = None # Need to get userID somehow
+    
+    # TODO: FIND WAY TO GET AND PASS USERID
+    user_id = GETUSERID() # Need to get userID somehow
 
     if (question_title == None):
         return jsonify(status=False, message="Thread title required.")
@@ -87,8 +90,26 @@ def create_thread():
     if (question_body == ""):
         question_body = None
     
-    write_queries.new_thread(question_title, user_id, question_body)
+    write_queries.add_thread(question_title, user_id, question_body)
     return jsonify(status=True, message="Thread has been created.")
+
+@app.route('/threads/<int:thread_id>/edit')
+def edit_thread():
+
+    new_question_title = request.form.get('title')
+    new_question_body = request.form.get('question-body')
+    
+    # TODO: FIND WAY TO PASS THREADID
+    thread_id = GETTHREADID()
+    
+    write_queries.edit_thread(thread_id, new_question_title, new_question_body)
+    return jsonify(status=True, message="Updated thread successfully")
+
+# Potential way to display an individual thread
+@app.route('/threads/<int:thread_id>')
+def display_thread(thread_id: int):
+    thread = Thread.query.filter(Thread.id == thread_id)
+    return jsonify(title=thread.question, body=thread.body, user=thread.user_id, date_asked=thread.timestamp)
 
 
 # @app.route('/api/test', methods=['GET'])
