@@ -31,7 +31,7 @@ def get_login():
 
 @app.route('/api/login', methods=['POST'])
 def login():
-    username = request.form.get('username')
+    username = request.form.get('sky_ussername')
     password = request.form.get('password')
     
     if (username != None and password != None):
