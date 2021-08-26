@@ -80,9 +80,13 @@ def create_thread():
     question_title = request.form.get('title')
     question_body = request.form.get('question-body')
     
-    # TODO: FIND WAY TO GET AND PASS USERID
-    user_id = GETUSERID() # Need to get userID somehow
+    error_msg = 'OH NO HELP'
+    user_id = request.args.get('user_id', error_msg) # Need to get userID somehow
 
+    if (user_id == error_msg):
+        return jsonify(status=False, message="request.args.get('user_id') couldn't get the user_id")
+
+    # This can probably be handled in frontend but yah
     if (question_title == None):
         return jsonify(status=False, message="Thread title required.")
     
@@ -94,13 +98,10 @@ def create_thread():
     return jsonify(status=True, message="Thread has been created.")
 
 @app.route('/threads/<int:thread_id>/edit')
-def edit_thread():
+def edit_thread(thread_id):
 
     new_question_title = request.form.get('title')
     new_question_body = request.form.get('question-body')
-    
-    # TODO: FIND WAY TO PASS THREADID
-    thread_id = GETTHREADID()
     
     write_queries.edit_thread(thread_id, new_question_title, new_question_body)
     return jsonify(status=True, message="Updated thread successfully")
