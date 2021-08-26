@@ -71,7 +71,7 @@ def register():
     return jsonify(username=username, status=False, message="Username password and sky username not be empty")
     
 
-@app.route('/api/logout', methods=['GET'])
+@app.route('/api/logout', methods=['GET','POST'])
 def logout():
     user = None
     try:
