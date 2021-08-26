@@ -97,7 +97,7 @@ def create_thread():
     write_queries.add_thread(question_title, user_id, question_body)
     return jsonify(status=True, message="Thread has been created.")
 
-@app.route('/threads/<int:thread_id>/edit')
+@app.route('/threads/<int:thread_id>/edit', methods=["POST"])
 def edit_thread(thread_id):
 
     new_question_title = request.form.get('title')
@@ -105,13 +105,6 @@ def edit_thread(thread_id):
     
     write_queries.edit_thread(thread_id, new_question_title, new_question_body)
     return jsonify(status=True, message="Updated thread successfully")
-
-# Potential way to display an individual thread
-@app.route('/threads/<int:thread_id>')
-def display_thread(thread_id: int):
-    thread = Thread.query.filter(Thread.id == thread_id)
-    return jsonify(title=thread.question, body=thread.body, user=thread.user_id, date_asked=thread.timestamp)
-
 
 # @app.route('/api/test', methods=['GET'])
 # def test():
