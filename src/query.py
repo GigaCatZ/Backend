@@ -1,5 +1,6 @@
 from .models import (Thread, db)
 from .models import (Users, db)
+from datetime import datetime
 import bcrypt
 
 class ReadOnly:
@@ -21,8 +22,18 @@ class WriteOnly:
         db.session.add(test)
         db.session.commit()
 
-
+    # Thread attempt begins here
+    def new_thread(self, thread_title, user_id, thread_body):
         
+        thread = Thread()
+        thread.question = thread_title
+        thread.body = thread_body
+        thread.user_id = user_id # Is this supposed to be an integer or a string / userid or SKY id ?!?!??!
+        thread.timestamp = datetime.now() # Not sure if this is necessary since Pornkamol said she would handle it in DB
+       
+        # Not sure if this is the way to do it
+        db.session.add(thread)
+        db.session.commit()
 
 read_queries = ReadOnly()
 write_queries = WriteOnly()

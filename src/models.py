@@ -21,6 +21,7 @@ class Thread(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     question = db.Column(db.Text, nullable=False)
+    body = db.Column(db.Text, nullable=True) # This is new (nullable=True because body can be empty?)
     timestamp = db.Column(db.DateTime, nullable=False)
     dupes = db.Column(db.Integer, default=1)
 

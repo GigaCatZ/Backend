@@ -71,6 +71,26 @@ def logout():
     logout_user()
     return jsonify(status=True)
 
+# Thread attempt begins here
+@app.route('/threads/new_thread', methods=['POST'])
+def create_thread():
+
+    # I assume we will be getting the thread information from the form they submit
+    question_title = request.form.get('title')
+    question_body = request.form.get('question-body')
+    user_id = None # Need to get userID somehow
+
+    if (question_title == None):
+        return jsonify(status=False, message="Thread title required.")
+    
+    # Perhaps not required
+    if (question_body == ""):
+        question_body = None
+    
+    write_queries.new_thread(question_title, user_id, question_body)
+    return jsonify(status=True, message="Thread has been created.")
+
+
 # @app.route('/api/test', methods=['GET'])
 # def test():
     # return "Login as " + str(current_user)
