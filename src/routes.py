@@ -53,17 +53,17 @@ def login():
 
 @app.route('/api/register', methods=['POST'])
 def register():
-    username = request.form.get('username')
+    display_name = request.form.get('display_name')
     password = request.form.get('password')
-    sky_user = request.form.get('sky_username')
+    username = request.form.get('sky_username')
 
-    if (username != None and password != None and sky_user != None):
+    if (username is not None and password is not None and display_name is not None):
         try:
-            write_queries.register_client(sky_user, username, password)
+            write_queries.register_client(username, display_name, password)
+            return jsonify(username=username, status=True, message="Registered successfully!")
         except (IntegrityError):
-            return jsonify(username=username, status=False, message="Username or sky username already taken")
-        return jsonify(username=username, status=True, message="Register successfully")
-    return jsonify(username=username, status=False, message="Username, password and sky username cannot be empty")
+            return jsonify(username=username, status=False, message="Username or Display Name has already been taken")
+    return jsonify(username=username, status=False, message="Fields must not be empty")
     
 
 @app.route('/api/logout', methods=['GET','POST'])
