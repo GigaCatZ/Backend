@@ -19,9 +19,9 @@ def load_user(user_id):
 @app.route('/api/whoami', methods=['GET'])
 def authenticate():
     if (current_user.is_authenticated):
-        return jsonify(isLoggedit=True, display_name=current_user.display_name, sky_username=current_user.sky_username)
+        return jsonify(is_logged_in=True, display_name=current_user.display_name, sky_username=current_user.sky_username)
     else:
-        return jsonify(isLoggedit=False, display_name="", sky_username="")
+        return jsonify(is_logged_in=False, display_name="", sky_username="")
 
 @app.route('/api/login', methods=['POST'])
 def login():
