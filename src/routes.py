@@ -6,7 +6,7 @@ import bcrypt
 from flask_login.utils import login_required
 from sqlalchemy.exc import IntegrityError
 from .models import Users
-
+from .models import Thread
 
 from .query import read_queries, write_queries
 
@@ -81,10 +81,42 @@ def logout():
     logout_user()
     return jsonify(status=True, username=user, message="Logout successfully")
 
-@app.route('/api/test', methods=['GET'])
-def test():
-    try:
-        return "Login as " + str(current_user.username)
-    except (AttributeError):
-        return "Not login yet"
+# Thread attempt begins here
+@app.route('/threads/new_thread', methods=['POST'])
+def create_thread():
+    """ Route/function to create a new thread """
+
+    # I assume we will be getting the thread information from the form they submit
+    question_title = request.form.get('title')
+    question_body = request.form.get('question-body')
+    
+    error_msg = 'OH NO HELP'
+    user_id = request.args.get('user_id', error_msg) # Need to get userID somehow
+
+    if (user_id == error_msg):
+        return jsonify(status=False, message="request.args.get('user_id') couldn't get the user_id")
+
+    # This can probably be handled in frontend but yah
+    if (question_title == None):
+        return jsonify(status=False, message="Thread title required.")
+    
+    # Perhaps not required
+    if (question_body == ""):
+        question_body = None
+    
+    write_queries.add_thread(question_title, user_id, question_body)
+    return jsonify(status=True, message="Thread has been created.")
+
+@app.route('/threads/<int:thread_id>/edit', methods=["POST"])
+def edit_thread(thread_id):
+
+    new_question_title = request.form.get('title')
+    new_question_body = request.form.get('question-body')
+    
+    write_queries.edit_thread(thread_id, new_question_title, new_question_body)
+    return jsonify(status=True, message="Updated thread successfully")
+
+# @app.route('/api/test', methods=['GET'])
+# def test():
+    # return "Login as " + str(current_user)
 
