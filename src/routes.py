@@ -113,7 +113,7 @@ def create_thread():
 
 
 # will test this later once we confirm how frontend gonna do this
-@app.route('/threads/<int:thread_id>/edit')
+@app.route('/threads/<int:thread_id>/edit', methods=['POST'])
 def edit_thread(thread_id):
 
     new_question_title = request.form.get('title')
