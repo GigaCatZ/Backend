@@ -1,15 +1,9 @@
 PIPENV=pipenv
-PYLIB=flask
+PYLIB=flask flask-login bcrypt PyMySQL flask-sqlalchemy python-dotenv
 
-all: install run_env
-
-install:
+init:
 	$(PIPENV) --python 3.9
 	$(PIPENV) install $(PYLIB)
 
-run_env:
-	$(PIPENV) shell
-
 run:
-	FLASK_APP=src/app flask run
-
+	FLASK_APP=src/__init__ flask run
