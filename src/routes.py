@@ -5,8 +5,6 @@ from flask_login import LoginManager, login_user, logout_user, current_user
 import bcrypt
 from flask_login.utils import login_required
 from sqlalchemy.exc import IntegrityError
-from .models import Users
-
 
 from .query import read_queries, write_queries
 
@@ -16,7 +14,7 @@ login_manager.init_app(app)
 @login_manager.user_loader
 def load_user(user_id):
     print("pass")
-    return Users.query.get(int(user_id))
+    return read_queries.get_user_from_id(user_id)
 
 # THIS IS A DUMMY THING COPIED FROM AJ KANAT
 
@@ -48,7 +46,7 @@ def login():
             # only uncomment when testing (in case we manually add password without encrypt lol)
             # encrypted_password = bcrypt.hashpw(str.encode(encrypted_password), bcrypt.gensalt(10))
             if (bcrypt.checkpw(passwordToByte, encrypted_password.encode('utf8'))):
-                current_user = Users.query.filter(Users.username == username).first()
+                current_user = read_queries.get_user_from_username(username)
                 login_user(current_user, remember=True)
                 return jsonify(username=username, status=True, message="Login successfully")
     return jsonify(username="", status=False, message="Can not login")
@@ -58,13 +56,10 @@ def register():
     username = request.form.get('username')
     password = request.form.get('password')
     sky_user = request.form.get('sky_username')
-    mod = request.form.get('mod')
 
     if (username != None and password != None and sky_user != None):
-        if mod == None:
-            mod = False
         try:
-            write_queries.register_client(sky_user,username,password, mod)
+            write_queries.register_client(sky_user, username, password)
         except (IntegrityError):
             return jsonify(username=username, status=False, message="Username or sky username already taken")
         return jsonify(username=username, status=True, message="Register successfully")
@@ -87,4 +82,54 @@ def test():
         return "Login as " + str(current_user.username)
     except (AttributeError):
         return "Not login yet"
+    return jsonify(status=True)
+
+# Thread attempt begins here
+@app.route('/api/new_thread', methods=['POST'])
+def create_thread():
+    """ Route/function to create a new thread """
+
+    # I assume we will be getting the thread information from the form they submit
+    question_title = request.form.get('title')
+    question_body = request.form.get('question-body')
+    
+    error_msg = 'OH NO HELP'
+    # will change back to args, depending on how frontend chooses to send the username to us
+    username = request.form.get('sky_username', error_msg) # Need to get userID somehow
+
+    if (username == error_msg):
+        return jsonify(status=False, message="request.args.get('username') couldn't get the user_id")
+
+    # This can probably be handled in frontend but yah
+    if (question_title == None):
+        return jsonify(status=False, message="Thread title required.")
+    
+    # Perhaps not required
+    if (question_body == ""):
+        question_body = None
+    
+    write_queries.add_thread(question_title, username, question_body, request.form.get('tags'))
+    return jsonify(status=True, message="Thread has been created.")
+
+
+# will test this later once we confirm how frontend gonna do this
+@app.route('/threads/<int:thread_id>/edit')
+def edit_thread(thread_id):
+
+    new_question_title = request.form.get('title')
+    new_question_body = request.form.get('question-body')
+    
+    write_queries.edit_thread(thread_id, new_question_title, new_question_body)
+    return jsonify(status=True, message="Updated thread successfully")
+
+# Potential way to display an individual thread
+@app.route('/threads/<int:thread_id>')
+def display_thread(thread_id: int):
+    thread = Thread.query.filter(Thread.id == thread_id)
+    return jsonify(title=thread.question, body=thread.body, user=thread.user_id, date_asked=thread.timestamp)
+
+
+# @app.route('/api/test', methods=['GET'])
+# def test():
+    # return "Login as " + str(current_user)
 
