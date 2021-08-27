@@ -41,9 +41,7 @@ def login():
                 cur_user = read_queries.get_user_from_username(username)
                 login_user(cur_user, remember=True)
                 return jsonify(username=username, status=True, message="Login successfully")
-            else:
-                return jsonify(username="", status=False, message="Incorrect Password")
-    return jsonify(username="", status=False, message="User does not exist.")
+    return jsonify(username="", status=False, message="Incorrect Username or Password")
 
 @app.route('/api/register', methods=['POST'])
 def register():
