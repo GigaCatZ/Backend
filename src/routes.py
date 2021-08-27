@@ -15,6 +15,20 @@ def load_user(user_id):
     return read_queries.get_user_from_id(user_id)
 
 
+@app.route('/api/checkuser', methods=['POST'])
+def createuser():
+    display_name = request.form.get('display_name')
+
+    if (display_name != None):
+        count = read_queries.get_user_from_display_name(display_name).count()
+        if (count == 0):
+            return jsonify(status=True, message="Display name is not taken yet")
+        else:
+            return jsonify(status=False, message="Display name already taken")
+    return jsonify(status=False, message="Api does not get data")
+        
+
+
 
 @app.route('/api/whoami', methods=['GET'])
 def authenticate():
@@ -75,32 +89,41 @@ def test():
         return "Not login yet"
     return jsonify(status=True)
 
+@app.route('/api/create_thread', methods=['GET'])
+def get_all_tags():
+    return jsonify(courses=read_queries.display_all_tags())
+
 # Thread attempt begins here
-@app.route('/api/new_thread', methods=['POST'])
+@app.route('/api/create_thread', methods=['POST'])
 def create_thread():
     """ Route/function to create a new thread """
 
     # I assume we will be getting the thread information from the form they submit
     question_title = request.form.get('title')
-    question_body = request.form.get('question-body')
+    question_body = request.form.get('text')
     
-    error_msg = 'OH NO HELP'
     # will change back to args, depending on how frontend chooses to send the username to us
-    username = request.form.get('sky_username', error_msg) # Need to get userID somehow
+    username = request.form.get('username') # Need to get userID somehow
+    tags = request.form.get('tags')
 
-    if (username == error_msg):
-        return jsonify(status=False, message="request.args.get('username') couldn't get the user_id")
+    if (username == None):
+        return jsonify(status=False, username=None, thread_id=None, title=None, tags=None, message="Couldn't get the username")
 
     # This can probably be handled in frontend but yah
     if (question_title == None):
-        return jsonify(status=False, message="Thread title required.")
+        return jsonify(status=False, username=None, thread_id=None, title=None, tags=None,  message="Thread title required.")
     
-    # Perhaps not required
+    # Perhaps not requiredt
     if (question_body == ""):
         question_body = None
+
+    try:
+        tags = tags.split(',')
+    except(AttributeError):
+        tags = []
     
-    write_queries.add_thread(question_title, username, question_body, request.form.get('tags'))
-    return jsonify(status=True, message="Thread has been created.")
+    thread = write_queries.add_thread(question_title, username, question_body, tags)
+    return jsonify(status=True, username=username, thread_id=thread.id, thread_title=thread.question, tags=tags,  message="Thread has been created.")
 
 
 # will test this later once we confirm how frontend gonna do this
@@ -115,8 +138,13 @@ def edit_thread(thread_id):
 
 # Potential way to display an individual thread
 @app.route('/threads/<int:thread_id>')
-def display_thread(thread_id: int):
+def display_thread(thread_id):
     thread = Thread.query.filter(Thread.id == thread_id)
     return jsonify(title=thread.question, body=thread.body, user=thread.user_id, date_asked=thread.timestamp)
 
 
+@app.route('/api/home', methods=['POST'])
+def homepage():
+    order = request.form.get('order')
+    threads, status = read_queries.get_thread_by_order(order)
+    return jsonify(tags=read_queries.display_top_tags(), order=order, threads=threads, status=status)

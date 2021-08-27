@@ -36,15 +36,16 @@ class TagLine(db.Model):
     
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     thread_id = db.Column(db.Integer, db.ForeignKey('thread.id'), nullable=False)
-    tag = db.Column(db.String(25), db.ForeignKey('tag.id'), nullable=False)
+    tag = db.Column(db.Integer, db.ForeignKey('tag.id'), nullable=False)
 
 
 class Tag(db.Model):
     """Data model for Tags"""
 
     __tablename__ = 'tag'
-    
-    id = db.Column(db.String(25), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    course_id = db.Column(db.String(25))
+    name = db.Column(db.String(100))
     count = db.Column(db.Integer, default=0)
 
 

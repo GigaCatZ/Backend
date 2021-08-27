@@ -3,7 +3,9 @@ from .models import (Users, db)
 from .models import (TagLine, db)
 from .models import (Tag, db)
 from datetime import datetime
+
 import bcrypt
+from flask import jsonify
 
 class ReadOnly:
     def get_encrypted_password(self, username):
@@ -23,6 +25,36 @@ class ReadOnly:
     
     def get_user_from_id(self, user_id):
         return Users.query.get(int(user_id))
+
+    def get_user_from_display_name(self, display):
+        return Users.query.filter(Users.display_name == display)
+
+    def display_tags(self, queried):
+        return [f'{course.course_id} | {course.name}' for course in queried]
+
+    def display_all_tags(self):
+        return self.display_tags(Tag.query.filter(Tag.id != 1))
+
+    def display_top_tags(self):
+        return self.display_tags(Tag.query.filter(Tag.id != 1).order_by(Tag.count.desc()).limit(10))
+
+    def get_tags_from_thread(self, thread_id):
+        queried = TagLine.query.filter(TagLine.thread_id == thread_id).join(Tag, TagLine.tag==Tag.id).add_column(Tag.course_id).all()
+        return [tag[-1] for tag in queried]
+    
+    def get_thread_by_order(self, order):
+        if order is not None and order == "RECENT":
+            queried = Thread.query.join(Users, Users.id==Thread.user_id)\
+                .add_columns(Thread.id, Thread.question, Thread.timestamp, Users.display_name)\
+                    .order_by(Thread.timestamp.desc()).limit(10)
+            return [self.jsonify_thread(thread) for thread in queried.all()], "Successfully queried tags and threads"
+        else:
+            return None, "Not valid order"
+
+    def jsonify_thread(self, thread):
+        _, thread_id, title, date, display_name = thread
+        # print('\n\n\n\n', thread_id, title, date, display_name, '\n\n\n\n')
+        return {'thread_id':thread_id, 'title':title, 'display_name':display_name, 'date':date, 'tags':self.get_tags_from_thread(thread_id)}
 
 class WriteOnly:
     def __init__(self):
@@ -44,16 +76,17 @@ class WriteOnly:
         db.session.add(thread)
         db.session.commit() # commit in case of one-to-many relationship foreign key
         try:
-            tag_in_table = Tag.query.filter(Tag.id=='muic').first()
-            tag_in_table.count += 1
+            tag_in_table = Tag.query.filter(Tag.id=='MUIC').first()
             db.session.commit()
             for tag in tags:
+                tag = tag.split()[0]
                 db.session.add(TagLine(thread_id=thread.id, tag=tag))
                 tag_in_table = Tag.query.filter(Tag.id==tag).first()
                 tag_in_table.count += 1
                 db.session.commit()
         except:
             print("A tag doesn't exist") # we will guarantee that tag exists 
+        return thread
 
     # If we allow threads to be deleted (probably not the way to do it)   
     def delete_thread(self, thread_id):
