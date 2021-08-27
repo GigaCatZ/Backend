@@ -59,6 +59,10 @@ class ReadOnly:
         # print('\n\n\n\n', thread_id, title, date, display_name, '\n\n\n\n')
         return {'thread_id':thread_id, 'title':title, 'display_name':display_name, 'date':date, 'tags':self.get_courseids_from_thread(thread_id)}
 
+    def tag_lookup(self, course_id):
+        tag = Tag.query.filter(Tag.course_id == course_id).first()
+        return tag.id if tag is not None else None
+
 class WriteOnly:
     def __init__(self):
         self.read_queries = ReadOnly()
@@ -79,10 +83,10 @@ class WriteOnly:
         db.session.add(thread)
         db.session.commit() # commit in case of one-to-many relationship foreign key
         try:
-            tag_in_table = Tag.query.filter(Tag.id=='MUIC').first()
+            tag_in_table = Tag.query.filter(Tag.id==1).first()
             db.session.commit()
             for tag in tags:
-                tag = tag.split()[0]
+                tag = self.read_queries.tag_lookup(tag.split()[0])
                 db.session.add(TagLine(thread_id=thread.id, tag=tag))
                 tag_in_table = Tag.query.filter(Tag.id==tag).first()
                 tag_in_table.count += 1
