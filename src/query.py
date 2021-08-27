@@ -54,6 +54,7 @@ class WriteOnly:
                 db.session.commit()
         except:
             print("A tag doesn't exist") # we will guarantee that tag exists 
+        return thread
 
     # If we allow threads to be deleted (probably not the way to do it)   
     def delete_thread(self, thread_id):

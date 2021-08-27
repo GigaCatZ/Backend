@@ -76,31 +76,32 @@ def test():
     return jsonify(status=True)
 
 # Thread attempt begins here
-@app.route('/api/new_thread', methods=['POST'])
+@app.route('/api/create_thread', methods=['POST'])
 def create_thread():
     """ Route/function to create a new thread """
 
     # I assume we will be getting the thread information from the form they submit
     question_title = request.form.get('title')
-    question_body = request.form.get('question-body')
+    question_body = request.form.get('text')
     
     error_msg = 'OH NO HELP'
     # will change back to args, depending on how frontend chooses to send the username to us
     username = request.form.get('sky_username', error_msg) # Need to get userID somehow
+    tags = request.form.get('tags')
 
     if (username == error_msg):
-        return jsonify(status=False, message="request.args.get('username') couldn't get the user_id")
+        return jsonify(status=False, thread_id=None, title=None, tags=None, message="Couldn't get the username")
 
     # This can probably be handled in frontend but yah
     if (question_title == None):
-        return jsonify(status=False, message="Thread title required.")
+        return jsonify(status=False, thread_id=None, title=None, tags=None,  message="Thread title required.")
     
-    # Perhaps not required
+    # Perhaps not requiredt
     if (question_body == ""):
         question_body = None
     
-    write_queries.add_thread(question_title, username, question_body, request.form.get('tags'))
-    return jsonify(status=True, message="Thread has been created.")
+    thread = write_queries.add_thread(question_title, username, question_body, tags)
+    return jsonify(status=True, thread_id=thread.id, thread_title=thread.body, tags=tags,  message="Thread has been created.")
 
 
 # will test this later once we confirm how frontend gonna do this
