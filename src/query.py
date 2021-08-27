@@ -24,6 +24,12 @@ class ReadOnly:
     def get_user_from_id(self, user_id):
         return Users.query.get(int(user_id))
 
+    def get_all_tags(self):
+        queried = Tag.query.filter(Tag.id != 'MUIC')
+        courses = set()
+        return list((course.id, course.name) for course in queried)
+
+
 class WriteOnly:
     def __init__(self):
         self.read_queries = ReadOnly()

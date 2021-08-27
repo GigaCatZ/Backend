@@ -75,6 +75,11 @@ def test():
         return "Not login yet"
     return jsonify(status=True)
 
+@app.route('/api/create_thread', methods=['GET'])
+def get_all_tags():
+    courses = read_queries.get_all_tags()
+    return jsonify(courses=courses)
+
 # Thread attempt begins here
 @app.route('/api/create_thread', methods=['POST'])
 def create_thread():

@@ -45,6 +45,7 @@ class Tag(db.Model):
     __tablename__ = 'tag'
     
     id = db.Column(db.String(25), primary_key=True)
+    name = db.Column(db.String(100))
     count = db.Column(db.Integer, default=0)
 
 
