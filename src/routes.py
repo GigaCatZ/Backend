@@ -15,6 +15,20 @@ def load_user(user_id):
     return read_queries.get_user_from_id(user_id)
 
 
+@app.route('/api/checkuser', methods=['POST'])
+def createuser():
+    display_name = request.form.get('display_name')
+
+    if (display_name != None):
+        count = read_queries.get_user_from_display_name(display_name).count()
+        if (count == 0):
+            return jsonify(status=True, message="Display name is not taken yet")
+        else:
+            return jsonify(status=False, message="Display name already taken")
+    return jsonify(status=False, message="Api does not get data")
+        
+
+
 
 @app.route('/api/whoami', methods=['GET'])
 def authenticate():
