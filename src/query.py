@@ -39,8 +39,8 @@ class ReadOnly:
         return self.display_tags(Tag.query.filter(Tag.id != 1).order_by(Tag.count.desc()).limit(10))
 
     def get_tags_from_thread(self, thread_id):
-        queried = TagLine.query.filter(TagLine.thread_id == thread_id).all()
-        return [tag.course_id for tag in queried]
+        queried = TagLine.query.filter(TagLine.thread_id == thread_id).join(Tag, TagLine.tag==Tag.id).add_column(Tag.course_id).all()
+        return [tag[:-1] for tag in queried]
     
     def get_thread_by_order(self, order):
         if order is not None and order == "RECENT":
