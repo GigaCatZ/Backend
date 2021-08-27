@@ -40,14 +40,13 @@ class ReadOnly:
 
     def get_tags_from_thread(self, thread_id):
         queried = TagLine.query.filter(TagLine.thread_id == thread_id).join(Tag, TagLine.tag==Tag.id).add_column(Tag.course_id).all()
-        return [tag[:-1] for tag in queried]
+        return [tag[-1] for tag in queried]
     
     def get_thread_by_order(self, order):
         if order is not None and order == "RECENT":
             queried = Thread.query.join(Users, Users.id==Thread.user_id)\
                 .add_columns(Thread.id, Thread.question, Thread.timestamp, Users.display_name)\
                     .order_by(Thread.timestamp.desc()).limit(10)
-            print("=======\n\n\n", queried.all(), "\n\n\n=======")
             return [self.jsonify_thread(thread) for thread in queried.all()], "Successfully queried tags and threads"
         else:
             return None, "Not valid order"
