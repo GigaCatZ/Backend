@@ -3,7 +3,9 @@ from .models import (Users, db)
 from .models import (TagLine, db)
 from .models import (Tag, db)
 from datetime import datetime
+
 import bcrypt
+from flask import jsonify
 
 class ReadOnly:
     def get_encrypted_password(self, username):
@@ -24,14 +26,34 @@ class ReadOnly:
     def get_user_from_id(self, user_id):
         return Users.query.get(int(user_id))
 
-    def get_all_tags(self):
-        queried = Tag.query.filter(Tag.id != 'MUIC')
+    def display_tags(self, queried):
         course_count = queried.count()
-        courses = [0]*course_count
-        for idx, course in enumerate(queried):
-            courses[idx] = f'{course.id} | {course.name}'
-        return courses
+        return [f'{course.id} | {course.name}' for course in queried]
 
+    def display_all_tags(self):
+        return self.display_tags(Tag.query.filter(Tag.id != 'MUIC'))
+
+    def display_top_tags(self):
+        return self.display_tags(Tag.query.filter(Tag.id != 'MUIC').order_by(Tag.count.desc()).limit(10))
+
+    def get_tags_from_thread(self, thread_id):
+        queried = TagLine.query.filter(TagLine.thread_id == thread_id).all()
+        return [tag.id for tag in queried]
+    
+    def get_thread_by_order(self, order):
+        if order is not None and order == "RECENT":
+            queried = Thread.query.join(Users, Users.id==Thread.user_id)\
+                .add_columns(Thread.id, Thread.question, Thread.timestamp, Users.display_name)\
+                    .order_by(Thread.timestamp).limit(10)
+            print("=======\n\n\n", queried.all(), "\n\n\n=======")
+            return [self.jsonify_thread(thread) for thread in queried.all()], "Successfully queried tags and threads"
+        else:
+            return None, "Not valid order"
+
+    def jsonify_thread(self, thread):
+        _, thread_id, title, date, display_name = thread
+        # print('\n\n\n\n', thread_id, title, date, display_name, '\n\n\n\n')
+        return {'thread_id':thread_id, 'title':title, 'display_name':display_name, 'date':date, 'tags':self.get_tags_from_thread(thread_id)}
 
 class WriteOnly:
     def __init__(self):

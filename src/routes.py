@@ -77,8 +77,7 @@ def test():
 
 @app.route('/api/create_thread', methods=['GET'])
 def get_all_tags():
-    courses = read_queries.get_all_tags()
-    return jsonify(courses=courses)
+    return jsonify(courses=read_queries.display_all_tags())
 
 # Thread attempt begins here
 @app.route('/api/create_thread', methods=['POST'])
@@ -103,8 +102,13 @@ def create_thread():
     # Perhaps not requiredt
     if (question_body == ""):
         question_body = None
+
+    try:
+        tags = tags.split(',')
+    except(AttributeError):
+        tags = []
     
-    thread = write_queries.add_thread(question_title, username, question_body, tags.split(','))
+    thread = write_queries.add_thread(question_title, username, question_body, tags)
     return jsonify(status=True, username=username, thread_id=thread.id, thread_title=thread.question, tags=tags,  message="Thread has been created.")
 
 
@@ -120,8 +124,13 @@ def edit_thread(thread_id):
 
 # Potential way to display an individual thread
 @app.route('/threads/<int:thread_id>')
-def display_thread(thread_id: int):
+def display_thread(thread_id):
     thread = Thread.query.filter(Thread.id == thread_id)
     return jsonify(title=thread.question, body=thread.body, user=thread.user_id, date_asked=thread.timestamp)
 
 
+@app.route('/api/home')
+def homepage():
+    order = request.form.get('order')
+    threads, status = read_queries.get_thread_by_order(order)
+    return jsonify(tags=read_queries.display_top_tags(), order=order, threads=threads, status=status)
