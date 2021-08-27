@@ -26,9 +26,6 @@ def createuser():
         else:
             return jsonify(status=False, message="Display name already taken")
     return jsonify(status=False, message="Api does not get data")
-        
-
-
 
 @app.route('/api/whoami', methods=['GET'])
 def authenticate():
@@ -148,3 +145,13 @@ def homepage():
     order = request.form.get('order')
     threads, status = read_queries.get_thread_by_order(order)
     return jsonify(tags=read_queries.display_top_tags(), order=order, threads=threads, status=status)
+
+
+@app.route('/api/getthread', methods=['POST'])
+def get_thread_info():
+    thread = read_queries.get_thread_by_id(request.form.get('thread_id'))
+    try:
+        return jsonify(status=True, tag_id=thread.id, author=read_queries.get_user_from_id(thread.user_id).display_name, title=thread.question,\
+            body=thread.body, timestamp=thread.timestamp, likes=thread.likes)
+    except(AttributeError):
+        return jsonify(status=False, tag_id=None, author=None, title=None, body=None, timestamp=None, likes=None)

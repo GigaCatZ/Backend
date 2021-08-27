@@ -18,7 +18,7 @@ class ReadOnly:
         return user.id if user is not None else None
 
     def get_thread_by_id(self, thread_id):
-        return Thread.query.filter(Thread.id == thread_id)
+        return Thread.query.filter(Thread.id == thread_id).first()
 
     def get_user_from_username(self, username):
         return Users.query.filter(Users.sky_username == username).first()
