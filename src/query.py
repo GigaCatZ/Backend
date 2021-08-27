@@ -43,13 +43,13 @@ class ReadOnly:
         return [tag[-1] for tag in queried]
     
     def get_tag_from_id(self, tag_id):
-        return Tag.query.filter(Tag.id == tag_id).all()
+        return Tag.query.filter(Tag.id == tag_id).first()
 
     def get_tags_from_thread(self, thread_id):
         queried = TagLine.query.filter(TagLine.thread_id == thread_id).join(Tag, TagLine.tag==Tag.id).all()
         tags = set()
-        for tag_id in queried:
-            tag_info = self.get_tag_from_id(tag_id)
+        for tag in queried:
+            tag_info = self.get_tag_from_id(tag.id)
             tags |= {f'{tag_info.course_id} | {tag_info.name}'}
         return list(tags)
 
