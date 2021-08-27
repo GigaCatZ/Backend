@@ -84,12 +84,11 @@ def create_thread():
     question_title = request.form.get('title')
     question_body = request.form.get('text')
     
-    error_msg = 'OH NO HELP'
     # will change back to args, depending on how frontend chooses to send the username to us
-    username = request.form.get('sky_username', error_msg) # Need to get userID somehow
+    username = request.form.get('username') # Need to get userID somehow
     tags = request.form.get('tags')
 
-    if (username == error_msg):
+    if (username == None):
         return jsonify(status=False, thread_id=None, title=None, tags=None, message="Couldn't get the username")
 
     # This can probably be handled in frontend but yah
