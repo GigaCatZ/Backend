@@ -37,13 +37,21 @@ class ReadOnly:
 
     def display_top_tags(self):
         return self.display_tags(Tag.query.filter(Tag.id != 1).order_by(Tag.count.desc()).limit(10))
-
+    
     def get_courseids_from_thread(self, thread_id):
         queried = TagLine.query.filter(TagLine.thread_id == thread_id).join(Tag, TagLine.tag==Tag.id).add_column(Tag.course_id).all()
         return [tag[-1] for tag in queried]
     
+    def get_tag_from_id(self, tag_id):
+        return Tag.query.filter(Tag.id == tag_id).all()
+
     def get_tags_from_thread(self, thread_id):
-        return self.display_tags(TagLine.query.filter(TagLine.thread_id == thread_id).join(Tag, TagLine.tag==Tag.id).add_column(Tag.course_id))
+        queried = TagLine.query.filter(TagLine.thread_id == thread_id).join(Tag, TagLine.tag==Tag.id).all()
+        tags = set()
+        for tag_id in queried:
+            tag_info = self.get_tag_from_id(tag_id)
+            tags |= {f'{tag_info.course_id} | {tag_info.name}'}
+        return list(tags)
 
     def get_thread_by_order(self, order):
         if order is not None and order == "RECENT":
