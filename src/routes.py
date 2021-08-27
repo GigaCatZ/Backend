@@ -100,7 +100,7 @@ def create_thread():
         question_body = None
     
     thread = write_queries.add_thread(question_title, username, question_body, tags)
-    return jsonify(status=True, thread_id=thread.id, thread_title=thread.body, tags=tags,  message="Thread has been created.")
+    return jsonify(status=True, thread_id=thread.id, thread_title=thread.question, tags=tags,  message="Thread has been created.")
 
 
 # will test this later once we confirm how frontend gonna do this
