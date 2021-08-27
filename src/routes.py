@@ -77,8 +77,8 @@ def test():
 
 @app.route('/api/create_thread', methods=['GET'])
 def get_all_tags():
-    course_ids, course_names = read_queries.get_all_tags()
-    return jsonify(course_ids=course_ids, course_names=course_names)
+    courses = read_queries.get_all_tags()
+    return jsonify(courses=courses)
 
 # Thread attempt begins here
 @app.route('/api/create_thread', methods=['POST'])

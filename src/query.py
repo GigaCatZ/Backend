@@ -27,11 +27,10 @@ class ReadOnly:
     def get_all_tags(self):
         queried = Tag.query.filter(Tag.id != 'MUIC')
         course_count = queried.count()
-        course_ids = [0]*course_count
-        course_names = [0]*course_count
+        courses = [0]*course_count
         for idx, course in enumerate(queried):
-            course_ids[idx], course_names[idx] = course.id, course.name
-        return course_ids, course_names
+            courses[idx] = f'{course.id} | {course.name}'
+        return courses
 
 
 class WriteOnly:
@@ -57,6 +56,7 @@ class WriteOnly:
             tag_in_table = Tag.query.filter(Tag.id=='MUIC').first()
             db.session.commit()
             for tag in tags:
+                tag = tag.split()[0]
                 db.session.add(TagLine(thread_id=thread.id, tag=tag))
                 tag_in_table = Tag.query.filter(Tag.id==tag).first()
                 tag_in_table.count += 1
