@@ -9,7 +9,7 @@ def create_tags(*args, **kwargs):
     course_names = ['MUIC', 'Numerical Computations', 'Discrete Mathematics', 'System Skills and Low-level Programming', 'Introduction to Computer Programming', 'Data Structures and Object-Oriented Programming']
     for course_id, course_name in zip(course_ids, course_names):
         try:
-            db.session.add(Tag(id=course_id, name=course_name, count=0))
+            db.session.add(Tag(course_id=course_id, name=course_name, count=0))
         except (exc.IntegrityError):
             continue
     db.session.commit()

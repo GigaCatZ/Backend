@@ -38,7 +38,7 @@ class ReadOnly:
         return [f'{course.id} | {course.name}' for course in Tag.query.filter(Tag.id != 'MUIC')]
 
     def display_top_tags(self):
-        queried = self.display_tags(Tag.query.filter(Tag.id != 'MUIC').order_by(Tag.count.desc()).limit(10))
+        queried = Tag.query.filter(Tag.id != 'MUIC').order_by(Tag.count.desc()).limit(10)
         return [course.id for course in queried]
 
     def get_tags_from_thread(self, thread_id):

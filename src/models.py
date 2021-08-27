@@ -36,7 +36,7 @@ class TagLine(db.Model):
     
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     thread_id = db.Column(db.Integer, db.ForeignKey('thread.id'), nullable=False)
-    tag = db.Column(db.String(25), db.ForeignKey('tag.id'), nullable=False)
+    tag = db.Column(db.Integer, db.ForeignKey('tag.id'), nullable=False)
 
 
 class Tag(db.Model):
