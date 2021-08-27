@@ -104,7 +104,7 @@ def create_thread():
     if (question_body == ""):
         question_body = None
     
-    thread = write_queries.add_thread(question_title, username, question_body, tags)
+    thread = write_queries.add_thread(question_title, username, question_body, tags.split(','))
     return jsonify(status=True, username=username, thread_id=thread.id, thread_title=thread.question, tags=tags,  message="Thread has been created.")
 
 
