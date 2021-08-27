@@ -26,10 +26,18 @@ class ReadOnly:
     def get_user_from_id(self, user_id):
         return Users.query.get(int(user_id))
 
-    def display_tags(self, queried):
+    def get_user_from_display_name(self, display):
+        return Users.query.filter(Users.display_name == display)
+
+    def get_all_tags(self):
+        queried = Tag.query.filter(Tag.id != 'MUIC')
         course_count = queried.count()
         return [f'{course.id} | {course.name}' for course in queried]
 
+    def display_tags(self, queried):
+        course_count = queried.count()
+        return [f'{course.id} | {course.name}' for course in queried]
+        
     def display_all_tags(self):
         return self.display_tags(Tag.query.filter(Tag.id != 'MUIC'))
 
