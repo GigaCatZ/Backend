@@ -143,7 +143,7 @@ def display_thread(thread_id):
     return jsonify(title=thread.question, body=thread.body, user=thread.user_id, date_asked=thread.timestamp)
 
 
-@app.route('/api/home')
+@app.route('/api/home', methods=['POST'])
 def homepage():
     order = request.form.get('order')
     threads, status = read_queries.get_thread_by_order(order)
