@@ -151,7 +151,7 @@ def homepage():
 def get_thread_info():
     thread = read_queries.get_thread_by_id(request.form.get('thread_id'))
     try:
-        return jsonify(status=True, tag_id=thread.id, author=read_queries.get_user_from_id(thread.user_id).display_name, title=thread.question,\
-            body=thread.body, timestamp=thread.timestamp, likes=thread.likes)
+        return jsonify(status=True, thread_id=thread.id, author=read_queries.get_user_from_id(thread.user_id).display_name, title=thread.question,\
+            body=thread.body, timestamp=thread.timestamp, likes=thread.likes, comments=None, tags=read_queries.get_tags_from_thread(thread.id))
     except(AttributeError):
-        return jsonify(status=False, tag_id=None, author=None, title=None, body=None, timestamp=None, likes=None)
+        return jsonify(status=False, thread_id=None, author=None, title=None, body=None, timestamp=None, likes=None, comments=None, tags=None)
