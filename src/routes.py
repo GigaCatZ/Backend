@@ -89,18 +89,18 @@ def create_thread():
     tags = request.form.get('tags')
 
     if (username == None):
-        return jsonify(status=False, thread_id=None, title=None, tags=None, message="Couldn't get the username")
+        return jsonify(status=False, username=None, thread_id=None, title=None, tags=None, message="Couldn't get the username")
 
     # This can probably be handled in frontend but yah
     if (question_title == None):
-        return jsonify(status=False, thread_id=None, title=None, tags=None,  message="Thread title required.")
+        return jsonify(status=False, username=None, thread_id=None, title=None, tags=None,  message="Thread title required.")
     
     # Perhaps not requiredt
     if (question_body == ""):
         question_body = None
     
     thread = write_queries.add_thread(question_title, username, question_body, tags)
-    return jsonify(status=True, thread_id=thread.id, thread_title=thread.question, tags=tags,  message="Thread has been created.")
+    return jsonify(status=True, username=username, thread_id=thread.id, thread_title=thread.question, tags=tags,  message="Thread has been created.")
 
 
 # will test this later once we confirm how frontend gonna do this
