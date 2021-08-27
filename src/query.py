@@ -46,7 +46,7 @@ class ReadOnly:
         return Tag.query.filter(Tag.id == tag_id).first()
 
     def get_tags_from_thread(self, thread_id):
-        queried = TagLine.query.filter(TagLine.thread_id == thread_id).join(Tag, TagLine.tag==Tag.id).all()
+        queried = TagLine.query.filter(TagLine.tag != 1).filter(TagLine.thread_id == thread_id).join(Tag, TagLine.tag==Tag.id).all()
         tags = set()
         for tag in queried:
             tag_info = self.get_tag_from_id(tag.id)
