@@ -1,53 +1,69 @@
 from .models import (Thread, db)
 from .models import (Users, db)
+from .models import (TagLine, db)
+from .models import (Tag, db)
 from datetime import datetime
 import bcrypt
 
-def get_thread_by_id(thread_id) -> Thread:
-    return Thread.query.filter(Thread.id == thread_id)
-
 class ReadOnly:
     def get_encrypted_password(self, username):
-        user = Users.query.filter(Users.username == username)
+        user = self.get_user_from_username(username)
         # print('\n\n\n========== AHHHH' + user)
-        return user.first().encrypted_password if user is not None and user.first() is not None else None
+        return user.encrypted_password if user is not None else None
+
+    def get_id_from_username(self, username):
+        user = self.get_user_from_username(username)
+        return user.id if user is not None else None
+
+    def get_thread_by_id(self, thread_id):
+        return Thread.query.filter(Thread.id == thread_id)
+
+    def get_user_from_username(self, username):
+        return Users.query.filter(Users.sky_username == username).first()
+    
+    def get_user_from_id(self, user_id):
+        return Users.query.get(int(user_id))
 
 class WriteOnly:
-    def register_client(self,sky_username, display_name, password, email) -> None:
+    def __init__(self):
+        self.read_queries = ReadOnly()
+
+    def register_client(self,sky_username, display_name, password):
         passwordToByte = str.encode(password)
-        hash_password = bcrypt.hashpw(passwordToByte, bcrypt.gensalt(10)) 
-        # new_user = Users(sky_username,username,hash_password,email)
-        test = Users()
-        test.sky_username = sky_username
-        test.display_name = display_name
-        test.encrypted_password = hash_password
-        test.mod = mod
-        db.session.add(test)
+        hash_password = bcrypt.hashpw(passwordToByte, bcrypt.gensalt(10))
+        db.session.add(Users(sky_username=sky_username, display_name=display_name, mod=False, encrypted_password=hash_password))
         db.session.commit()
 
     # Thread attempt begins here
-    def add_thread(self, thread_title, user_id, thread_body):
+    def add_thread(self, thread_title, username, thread_body, tags):
         """ Function to create a new thread """ 
-        thread = Thread()
-        thread.question = thread_title
-        thread.body = thread_body
-        thread.user_id = user_id # Is this supposed to be an integer or a string / userid or SKY id ?!?!??!
-        thread.timestamp = datetime.now() # Not sure if this is necessary since Pornkamol said she would handle it in DB
        
         # Not sure if this is the way to do it
+        thread = Thread(question=thread_title, body=thread_body, \
+            user_id=self.read_queries.get_id_from_username(username), timestamp=datetime.now(), likes=0, dupes=1)
         db.session.add(thread)
-        
-        db.session.commit()
-       
+        db.session.commit() # commit in case of one-to-many relationship foreign key
+        try:
+            tag_in_table = Tag.query.filter(Tag.id=='muic').first()
+            tag_in_table.count += 1
+            db.session.commit()
+            for tag in tags:
+                db.session.add(TagLine(thread_id=thread.id, tag=tag))
+                tag_in_table = Tag.query.filter(Tag.id==tag).first()
+                tag_in_table.count += 1
+                db.session.commit()
+        except:
+            print("A tag doesn't exist") # we will guarantee that tag exists 
+
     # If we allow threads to be deleted (probably not the way to do it)   
     def delete_thread(self, thread_id):
-        thread = get_thread_by_id(thread_id)
+        thread = self.read_queries.get_thread_by_id(thread_id)
         db.session.delete(thread) # Can we do this?!
         
         db.session.commit()
     
     def edit_thread(self, thread_id, new_title, new_body):
-        thread = get_thread_by_id(thread_id) 
+        thread = self.read_queries.get_thread_by_id(thread_id) 
 
         # Even if the title or body is unchanged, it'll get "updated" with the old value
         thread.question = new_title
