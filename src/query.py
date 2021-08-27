@@ -34,12 +34,15 @@ class ReadOnly:
         course_count = queried.count()
         return [f'{course.id} | {course.name}' for course in queried]
 
+    def display_tags(self, queried):
+        course_count = queried.count()
+        return [f'{course.id} | {course.name}' for course in queried]
+
     def display_all_tags(self):
-        return [f'{course.id} | {course.name}' for course in Tag.query.filter(Tag.id != 'MUIC')]
+        return self.display_tags(Tag.query.filter(Tag.id != 'MUIC'))
 
     def display_top_tags(self):
-        queried = Tag.query.filter(Tag.id != 'MUIC').order_by(Tag.count.desc()).limit(10)
-        return [course.id for course in queried]
+        return self.display_tags(Tag.query.filter(Tag.id != 'MUIC').order_by(Tag.count.desc()).limit(10))
 
     def get_tags_from_thread(self, thread_id):
         queried = TagLine.query.filter(TagLine.thread_id == thread_id).all()
@@ -48,16 +51,17 @@ class ReadOnly:
     def get_thread_by_order(self, order):
         if order is not None and order == "RECENT":
             queried = Thread.query.join(Users, Users.id==Thread.user_id)\
-                .add_columns(Thread.id, Thread.question, Thread.timestamp, Thread.likes, Users.display_name)\
-                    .order_by(Thread.timestamp.desc()).limit(10)
+                .add_columns(Thread.id, Thread.question, Thread.timestamp, Users.display_name)\
+                    .order_by(Thread.timestamp).limit(10)
+            print("=======\n\n\n", queried.all(), "\n\n\n=======")
             return [self.jsonify_thread(thread) for thread in queried.all()], "Successfully queried tags and threads"
         else:
             return None, "Not valid order"
 
     def jsonify_thread(self, thread):
-        _, thread_id, title, date, likes, display_name = thread
+        _, thread_id, title, date, display_name = thread
         # print('\n\n\n\n', thread_id, title, date, display_name, '\n\n\n\n')
-        return {'thread_id':thread_id, 'title':title, 'likes':likes, 'display_name':display_name, 'date':date, 'tags':self.get_tags_from_thread(thread_id)}
+        return {'thread_id':thread_id, 'title':title, 'display_name':display_name, 'date':date, 'tags':self.get_tags_from_thread(thread_id)}
 
 class WriteOnly:
     def __init__(self):
