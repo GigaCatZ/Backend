@@ -26,8 +26,12 @@ class ReadOnly:
 
     def get_all_tags(self):
         queried = Tag.query.filter(Tag.id != 'MUIC')
-        courses = set()
-        return list((course.id, course.name) for course in queried)
+        course_count = queried.count()
+        course_ids = [0]*course_count
+        course_names = [0]*course_count
+        for idx, course in enumerate(queried):
+            course_ids[idx], course_names[idx] = course.id, course.name
+        return course_ids, course_names
 
 
 class WriteOnly:
@@ -50,8 +54,7 @@ class WriteOnly:
         db.session.add(thread)
         db.session.commit() # commit in case of one-to-many relationship foreign key
         try:
-            tag_in_table = Tag.query.filter(Tag.id=='muic').first()
-            tag_in_table.count += 1
+            tag_in_table = Tag.query.filter(Tag.id=='MUIC').first()
             db.session.commit()
             for tag in tags:
                 db.session.add(TagLine(thread_id=thread.id, tag=tag))
