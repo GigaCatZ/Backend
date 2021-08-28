@@ -56,20 +56,19 @@ class ReadOnly:
     def get_thread_by_order(self, order):
         if order is not None and order == "RECENT":
             queried = Thread.query.join(Users, Users.id==Thread.user_id)\
-                .add_columns(Thread.id, Thread.question, Thread.timestamp, Users.display_name)\
+                .add_columns(Thread.id, Thread.question, Thread.timestamp, Thread.likes, Users.display_name)\
                     .order_by(Thread.timestamp.desc()).limit(10)
             return [self.jsonify_thread(thread) for thread in queried.all()], "Successfully queried tags and threads"
         else:
             return None, "Not valid order"
 
     def jsonify_thread(self, thread):
-        _, thread_id, title, date, display_name = thread
+        _, thread_id, title, date, likes, display_name = thread
         # print('\n\n\n\n', thread_id, title, date, display_name, '\n\n\n\n')
-        return {'thread_id':thread_id, 'title':title, 'display_name':display_name, 'date':date, 'tags':self.get_courseids_from_thread(thread_id)}
+        return {'thread_id':thread_id, 'title':title, 'likes':likes, 'display_name':display_name, 'date':date, 'tags':self.get_courseids_from_thread(thread_id)}
 
     def tag_lookup(self, course_id):
         tag = Tag.query.filter(Tag.course_id == course_id).first()
         return tag.id if tag is not None else None
-    
     
 read_queries = ReadOnly()
