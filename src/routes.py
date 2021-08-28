@@ -5,7 +5,8 @@ from flask_login import LoginManager, login_user, logout_user, current_user
 import bcrypt
 from sqlalchemy.exc import IntegrityError
 
-from .query import read_queries, write_queries
+from .query import read_queries
+from .update_db import write_queries
 
 login_manager = LoginManager()
 login_manager.init_app(app)
