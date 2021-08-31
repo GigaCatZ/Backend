@@ -2,7 +2,7 @@ from .models import (Thread, db)
 from .models import (Users, db)
 from .models import (TagLine, db)
 from .models import (Tag, db)
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import bcrypt
 from flask import jsonify
@@ -54,11 +54,13 @@ class ReadOnly:
         return list(tags)
 
     def get_thread_by_order(self, order):
-        if order is not None and order == "RECENT":
+        if order is not None:
             queried = Thread.query.join(Users, Users.id==Thread.user_id)\
-                .add_columns(Thread.id, Thread.question, Thread.timestamp, Thread.likes, Users.display_name)\
-                    .order_by(Thread.timestamp.desc()).limit(10)
-            return [self.jsonify_thread(thread) for thread in queried.all()], "Successfully queried tags and threads"
+                .add_columns(Thread.id, Thread.question, Thread.timestamp, Thread.likes, Users.display_name)
+            if order == "RECENT": queried = queried.order_by(Thread.timestamp.desc())
+            elif order == "LIKES": queried = queried.order_by(Thread.likes.desc())
+            elif order == "POPULAR": queried.filter(Thread.timestamp >= (datetime.now() - timedelta(days=31))).order_by(Thread.likes.desc())
+            return [self.jsonify_thread(thread) for thread in queried.limit(10).all()], "Successfully queried tags and threads"
         else:
             return None, "Not valid order"
 
