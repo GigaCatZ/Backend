@@ -53,6 +53,5 @@ class WriteOnly:
         thread.body = new_body
 
         db.session.commit()
-    
-read_queries = ReadOnly()
+        
 write_queries = WriteOnly()
