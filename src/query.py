@@ -1,10 +1,6 @@
-from .models import (Thread, db)
-from .models import (Users, db)
-from .models import (TagLine, db)
-from .models import (Tag, db)
+from .models import *
 from datetime import datetime, timedelta
 
-import bcrypt
 from flask import jsonify
 
 class ReadOnly:
@@ -23,6 +19,9 @@ class ReadOnly:
     def get_user_from_username(self, username):
         return Users.query.filter(Users.sky_username == username).first()
     
+    def get_comment_by_id(self, comment_id):
+        return Comment.query.filter(Comment.id == comment_id).first()
+
     def get_user_from_id(self, user_id):
         return Users.query.get(int(user_id))
 
@@ -74,4 +73,14 @@ class ReadOnly:
         tag = Tag.query.filter(Tag.course_id == course_id).first()
         return tag.id if tag is not None else None
     
+    def get_comments_of_thread(self, thread_id):
+        queried = Comment.query.filter(Comment.thread_id == thread_id).filter(Comment.main_comment).order_by(Comment.likes.desc()).all()
+        return [{'sender': self.get_user_from_id(comment.user_id).display_name, 'timestamp': comment.timestamp, 'body': comment.comment_body, \
+            'likes' : comment.likes, 'replies' : self.get_all_replies(comment.id), 'comment_id' : comment.id } for comment in queried]
+
+    def get_all_replies(self, parent_id):
+        queried = Comment.query.join(CommentLine, CommentLine.child_comment_id==Comment.id).filter(CommentLine.parent_comment_id == parent_id).all()
+        return [{'sender': self.get_user_from_id(comment.user_id).display_name, 'timestamp': comment.timestamp, 'body': comment.comment_body, \
+            'likes' : comment.likes, 'comment_id' : comment.id } for comment in queried]
+
 read_queries = ReadOnly()

@@ -1,10 +1,8 @@
-from .models import (Thread, db)
-from .models import (Users, db)
-from .models import (TagLine, db)
-from .models import (Tag, db)
+from .models import *
 from datetime import datetime
 
 from .query import ReadOnly
+import bcrypt
 
 class WriteOnly:
     def __init__(self):
@@ -53,5 +51,33 @@ class WriteOnly:
         thread.body = new_body
 
         db.session.commit()
-        
+
+    # combined both new_comment methods into one
+    def add_comment(self, thread_id, comment_body, username, parent_id):
+        comment = Comment(user_id=self.read_queries.get_id_from_username(username), \
+            thread_id=thread_id, comment_body=comment_body, likes=0, main_comment=(parent_id is None), timestamp=datetime.now())
+        db.session.add(comment)
+        db.session.commit()
+        if not comment.main_comment:
+            db.session.add(CommentLine(parent_comment_id=parent_id, child_comment_id=comment.id))
+            db.session.commit()
+
+    def edit_comment(self, comment_id, new_comment_body):
+        comment = self.read_queries.get_comment_by_id(comment_id)
+        comment.comment_body = new_comment_body
+
+        db.session.commit()
+
+    def delete_comment(self, comment_id):
+        comment = self.read_queries.get_comment_by_id(comment_id)
+
+        # Would be nice if frontend could make this italic or something
+        comment.comment_body = "This comment has been removed by the user."
+        db.session.commit()
+
+    def upvote_thread(self, thread_id):
+        thread = self.read_queries.get_thread_by_id(thread_id)
+        thread.likes += 1
+        db.session.commit()
+
 write_queries = WriteOnly()

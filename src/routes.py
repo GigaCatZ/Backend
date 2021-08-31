@@ -7,6 +7,8 @@ from sqlalchemy.exc import IntegrityError
 
 from .query import read_queries
 from .update_db import write_queries
+from .models import Thread, Comment
+
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -125,12 +127,15 @@ def create_thread():
 
 
 # will test this later once we confirm how frontend gonna do this
-@app.route('/threads/<int:thread_id>/edit', methods=['POST'])
-def edit_thread(thread_id):
+@app.route('/api/edit_thread', methods=['POST'])
+def edit_thread():
 
     new_question_title = request.form.get('title')
     new_question_body = request.form.get('question-body')
     
+    # Writing this as a default
+    thread_id = request.form.get("thread-id")
+
     write_queries.edit_thread(thread_id, new_question_title, new_question_body)
     return jsonify(status=True, message="Updated thread successfully")
 
@@ -140,6 +145,45 @@ def display_thread(thread_id):
     thread = Thread.query.filter(Thread.id == thread_id)
     return jsonify(title=thread.question, body=thread.body, user=thread.user_id, date_asked=thread.timestamp)
 
+# COMMENT ATTEMPT BEGINS HERE (I'm just sticking with the format I used earlier, can change if frontend doesn't like it)
+@app.route('/api/new_comment', methods=['POST'])
+def new_comment():
+    
+    comment_body = request.form.get("comment_body")
+
+    if (comment_body is None or len(comment_body.strip()) == 0):
+        return jsonify(status=False, message="Empty comment body")
+
+    # Will change back to args, depending on how frontend chooses to send the username
+    username = request.form.get('username')
+    thread_id = request.form.get('thread_id')
+
+    parent_id = request.form.get('parent_id')
+
+    write_queries.add_comment(thread_id, comment_body, username, parent_id) 
+
+    return jsonify(username='username', thread_id='thread_id', parent_id='parent_id', status=True, message="Comment created successfully")
+    
+@app.route('/api/edit_comment')
+def edit_comment():
+    
+    new_comment_body = request.form.get("comment_body")
+    
+    if (len(new_comment_body.strip()) == 0):
+        return jsonify(status=False, message="Empty comment body")
+
+    # Again, defaulting to request.form.get until we have a way to request
+    comment_id = request.form.get("comment_id")
+    write_queries.edit_comment(comment_id, new_comment_body)
+    return jsonify(status=True, message="Reply created successfully")
+
+@app.route("/api/delete_comment")
+def delete_comment():
+
+    # Again, defaulting to request.form.get until we have a way to request
+    comment_id = request.form.get("comment_id")
+    write_queries.delete_comment(comment_id)
+    return jsonify(status=True, message="Comment deleted successfully")
 
 @app.route('/api/home', methods=['POST'])
 def homepage():
@@ -153,6 +197,6 @@ def get_thread_info():
     thread = read_queries.get_thread_by_id(request.form.get('thread_id'))
     try:
         return jsonify(status=True, thread_id=thread.id, author=read_queries.get_user_from_id(thread.user_id).display_name, title=thread.question,\
-            body=thread.body, timestamp=thread.timestamp, likes=thread.likes, comments=None, tags=read_queries.get_tags_from_thread(thread.id))
+            body=thread.body, timestamp=thread.timestamp, likes=thread.likes, comments=read_queries.get_comments_of_thread(thread.id), tags=read_queries.get_tags_from_thread(thread.id))
     except(AttributeError):
         return jsonify(status=False, thread_id=None, author=None, title=None, body=None, timestamp=None, likes=None, comments=None, tags=None)
