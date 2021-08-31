@@ -84,6 +84,7 @@ def authenticate():
 def login():
     username = request.form.get('sky_username')
     password = request.form.get('password')
+    remember = (request.form.get('remember')[0] == "t")
 
     if (current_user.is_authenticated):
         return jsonify(username=current_user.sky_username, status=True, message="You already log in")
@@ -96,7 +97,7 @@ def login():
         if (encrypted_password != None):
             if (bcrypt.checkpw(passwordToByte, encrypted_password.encode('utf8'))):
                 cur_user = read_queries.get_user_from_username(username)
-                login_user(cur_user, remember=True)
+                login_user(cur_user, remember = remember)
                 return jsonify(username=username, status=True, message="Login successfully")
     return jsonify(username="", status=False, message="Incorrect Username or Password")
 
