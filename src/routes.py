@@ -201,6 +201,10 @@ def get_thread_info():
     except(AttributeError):
         return jsonify(status=False, thread_id=None, author=None, title=None, body=None, timestamp=None, likes=None, comments=None, tags=None)
 
+@app.route('/api/all_threads', methods=['GET'])
+def get_all_threads():
+    threads, status, message = read_queries.get_thread_by_order("SEARCH")
+    return jsonify(threads=threads, status=status, message=message)
 
 @app.route("/api/faq", methods=["GET"])
 def get_top_threads():

@@ -2,6 +2,7 @@ from .models import *
 from datetime import datetime, timedelta
 
 from flask import jsonify
+from sqlalchemy import func
 
 class ReadOnly:
     def get_encrypted_password(self, username):
@@ -24,6 +25,9 @@ class ReadOnly:
 
     def get_user_from_id(self, user_id):
         return Users.query.get(int(user_id))
+
+    def get_comment_count(self, thread_id):
+        return len(Comment.query.filter(Comment.thread_id==thread_id).filter(Comment.main_comment).all())
 
     def get_user_from_display_name(self, display):
         return Users.query.filter(Users.display_name == display)
@@ -54,20 +58,21 @@ class ReadOnly:
         return list(tags)
 
     def get_thread_by_order(self, order):
-        if order is not None:
+        if order is not None and order in {"RECENT", "LIKES", "POPULAR", "SEARCH"}:
             queried = Thread.query.join(Users, Users.id==Thread.user_id)\
                 .add_columns(Thread.id, Thread.question, Thread.timestamp, Thread.likes, Users.display_name)
-            if order == "RECENT": queried = queried.order_by(Thread.timestamp.desc())
-            elif order == "LIKES": queried = queried.order_by(Thread.likes.desc())
-            elif order == "POPULAR": queried.filter(Thread.timestamp >= (datetime.now() - timedelta(days=31))).order_by(Thread.likes.desc())
-            return [self.jsonify_thread(thread) for thread in queried.limit(10).all()], "Successfully queried tags and threads"
+            if order == "RECENT": queried = queried.order_by(Thread.timestamp.desc()).limit(10)
+            elif order == "LIKES": queried = queried.order_by(Thread.likes.desc()).limit(10)
+            elif order == "POPULAR": queried.filter(Thread.timestamp >= (datetime.now() - timedelta(days=31))).order_by(Thread.likes.desc()).limit(10)
+            return [self.jsonify_thread(thread) for thread in queried.all()], True, "Successfully queried the threads"
         else:
-            return None, "Not valid order"
+            return None, False, "Not valid order"
 
     def jsonify_thread(self, thread):
         _, thread_id, title, date, likes, display_name = thread
         # print('\n\n\n\n', thread_id, title, date, display_name, '\n\n\n\n')
-        return {'thread_id':thread_id, 'title':title, 'likes':likes, 'display_name':display_name, 'date':date, 'tags':self.get_courseids_from_thread(thread_id)}
+        return {'thread_id':thread_id, 'title':title, 'likes':likes, 'display_name':display_name, 'date':date, 'tags':self.get_courseids_from_thread(thread_id), 'comment_count': self.get_comment_count(thread_id)}
+        # return {'thread_id':thread_id, 'title':title, 'likes':likes, 'display_name':display_name, 'date':date, 'tags':self.get_courseids_from_thread(thread_id)}
 
     def tag_lookup(self, course_id):
         tag = Tag.query.filter(Tag.course_id == course_id).first()
