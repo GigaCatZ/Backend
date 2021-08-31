@@ -18,6 +18,49 @@ def load_user(user_id):
     return read_queries.get_user_from_id(user_id)
 
 
+def filter_by_tags(thread, search_tags):
+    return len([tag for tag in thread['tags'] if (tag.lower() == search_tags)]) != 0
+
+def filter_by_title(thread, search_title):
+    return thread['title'].lower().startswith(search_title)
+
+def filter_by_display_name(thread, search_display_name):
+    return thread['display_name'] == search_display_name
+    
+    
+@app.route('/api/search', methods=['POST'])
+def search():
+    search_input = request.form.get('search_input')
+    type_search = request.form.get('type_search')
+    
+    all_types = {'tags': filter_by_tags, 'title': filter_by_title, 'display_name': filter_by_display_name}
+    if (type_search != None):
+        type_search_lower_case = type_search.lower()
+        is_matched = False
+        for each_type in all_types:
+            if (type_search_lower_case == each_type):
+                type_search = all_types[each_type]
+                is_matched = True
+                break;
+        if (is_matched == False):
+            type_search = filter_by_title
+        del type_search_lower_case
+        del is_matched
+    else:
+        type_search = filter_by_title
+    
+    thread_search = read_queries.get_thread_by_order('SEARCH')
+    search_input_lower_case = search_input.lower()
+    result = [thread for thread in thread_search[0] if (type_search(thread, search_input_lower_case))]
+    #   delete all objects before return
+    del search_input_lower_case
+    del search_input
+    del type_search
+    del all_types
+    del thread_search
+    return jsonify(search_result=result)
+            
+
 @app.route('/api/checkuser', methods=['POST'])
 def createuser():
     display_name = request.form.get('display_name')
@@ -201,10 +244,6 @@ def get_thread_info():
     except(AttributeError):
         return jsonify(status=False, thread_id=None, author=None, title=None, body=None, timestamp=None, likes=None, comments=None, tags=None)
 
-@app.route('/api/all_threads', methods=['GET'])
-def get_all_threads():
-    threads, status, message = read_queries.get_thread_by_order("SEARCH")
-    return jsonify(threads=threads, status=status, message=message)
 
 @app.route("/api/faq", methods=["GET"])
 def get_top_threads():
