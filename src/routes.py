@@ -156,3 +156,22 @@ def get_thread_info():
             body=thread.body, timestamp=thread.timestamp, likes=thread.likes, comments=None, tags=read_queries.get_tags_from_thread(thread.id))
     except(AttributeError):
         return jsonify(status=False, thread_id=None, author=None, title=None, body=None, timestamp=None, likes=None, comments=None, tags=None)
+
+@app.route("/api/faq", methods=["GET"])
+def get_top_threads():
+    topFive = []
+    queried = read_queries.get_thread_by_dupe()
+    print("\n\n", queried, "\n\n")
+    comments = [read_queries.get_top_comment(thread.id) for thread in queried]
+    print("\n\n", comments, "\n\n")
+
+    for thread, comment in zip(queried, comments):
+        tmp = {
+            "title": thread.question,
+            "body": thread.body,
+            "answer": comment
+        }
+        topFive.append(tmp)
+
+    res = {"response": topFive}
+    return jsonify(res)

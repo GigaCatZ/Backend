@@ -70,5 +70,14 @@ class ReadOnly:
     def tag_lookup(self, course_id):
         tag = Tag.query.filter(Tag.course_id == course_id).first()
         return tag.id if tag is not None else None
-    
+
+    def get_top_comment(self, thread_id):
+        # print(Comment.query.all())
+        return Comment.query.filter(Comment.thread_id == thread_id).order_by(Comment.likes.desc()).first()
+
+    def get_thread_by_dupe(self):
+        # print(Thread.query.all())
+        return Thread.query.filter(Thread.dupes > 1).order_by(Thread.dupes.desc()).limit(5)
+
+
 read_queries = ReadOnly()

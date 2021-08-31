@@ -1,5 +1,6 @@
-from . import db # db comes from __init__.py
+from . import db  # db comes from __init__.py
 from flask_login import UserMixin
+
 
 class Users(UserMixin, db.Model):
     """DUMMY Data model for Users"""
@@ -12,7 +13,6 @@ class Users(UserMixin, db.Model):
     encrypted_password = db.Column(db.String(100), nullable=False)
     mod = db.Column(db.Boolean, default=False)
 
-    
 
 class Thread(db.Model):
     """Data model for Thread"""
@@ -22,18 +22,17 @@ class Thread(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     question = db.Column(db.Text, nullable=False)
-    body = db.Column(db.Text, nullable=True) # This is new (nullable=True because body can be empty?)
+    body = db.Column(db.Text, nullable=True)  # This is new (nullable=True because body can be empty?)
     timestamp = db.Column(db.DateTime, nullable=False)
     dupes = db.Column(db.Integer, default=1)
     likes = db.Column(db.Integer, default=0)
-    
 
 
 class TagLine(db.Model):
     """Data model for TagLine"""
 
     __tablename__ = 'tag_line'
-    
+
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     thread_id = db.Column(db.Integer, db.ForeignKey('thread.id'), nullable=False)
     tag = db.Column(db.Integer, db.ForeignKey('tag.id'), nullable=False)
@@ -60,3 +59,4 @@ class Comment(db.Model):
     likes = db.Column(db.Integer, default=0)
     parent_id = db.Column(db.Integer, db.ForeignKey('comment.id'))
     timestamp = db.Column(db.DateTime)
+    body = db.Column(db.Text, nullable=False)  # Can't have empty comments now, can we?
