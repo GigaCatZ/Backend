@@ -39,6 +39,6 @@ def create_fake_threads(*args, **kwargs):
 
 @event.listens_for(Comment.__table__, "after_create")
 def create_fake_comments(*args, **kwargs):
-    db.session.add(Comment(user_id=1, thread_id=1, likes=3, parent_id=1, timestamp=datetime.now(), body="This is an answer #1"))
-    db.session.add(Comment(user_id=1, thread_id=2, likes=5, parent_id=1, timestamp=datetime.now(), body="This is an answer #2"))
+    db.session.add(Comment(user_id=1, thread_id=1, likes=3, timestamp=datetime.now(), body="This is an answer #1"))
+    db.session.add(Comment(user_id=1, thread_id=2, likes=5, timestamp=datetime.now(), body="This is an answer #2"))
     db.session.commit()
