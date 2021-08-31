@@ -188,8 +188,8 @@ def delete_comment():
 @app.route('/api/home', methods=['POST'])
 def homepage():
     order = request.form.get('order')
-    threads, status = read_queries.get_thread_by_order(order)
-    return jsonify(tags=read_queries.display_top_tags(), order=order, threads=threads, status=status)
+    threads, status, message = read_queries.get_thread_by_order(order)
+    return jsonify(tags=read_queries.display_top_tags(), order=order, threads=threads, message=message, status=status)
 
 
 @app.route('/api/getthread', methods=['POST'])
