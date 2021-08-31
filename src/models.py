@@ -42,6 +42,7 @@ class Tag(db.Model):
     """Data model for Tags"""
 
     __tablename__ = 'tag'
+
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     course_id = db.Column(db.String(25))
     name = db.Column(db.String(100))
