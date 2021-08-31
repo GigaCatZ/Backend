@@ -33,10 +33,10 @@ class ReadOnly:
         return [f'{course.course_id} | {course.name}' for course in queried]
 
     def display_all_tags(self):
-        return self.display_tags(Tag.query.filter(Tag.id != 1))
+        return self.display_tags(Tag.query)
 
     def display_top_tags(self):
-        return self.display_tags(Tag.query.filter(Tag.id != 1).order_by(Tag.count.desc()).limit(10))
+        return self.display_tags(Tag.query.order_by(Tag.count.desc()).limit(10))
     
     def get_courseids_from_thread(self, thread_id):
         queried = TagLine.query.filter(TagLine.thread_id == thread_id).join(Tag, TagLine.tag==Tag.id).add_column(Tag.course_id).all()
@@ -48,6 +48,7 @@ class ReadOnly:
     def get_tags_from_thread(self, thread_id):
         queried = TagLine.query.filter(TagLine.thread_id == thread_id).join(Tag, TagLine.tag==Tag.id).all()
         tags = set()
+        []
         for tag in queried:
             tag_info = self.get_tag_from_id(tag.tag)
             tags |= {f'{tag_info.course_id} | {tag_info.name}'}
