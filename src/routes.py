@@ -39,6 +39,8 @@ def search():
         for each_type in all_types:
             if (type_search_lower_case == each_type):
                 filter_function = all_types[each_type]
+                if (each_type == 'tags'):
+                    search_input = search_input.split('|')[0].strip()
                 break;
         del type_search_lower_case
     
