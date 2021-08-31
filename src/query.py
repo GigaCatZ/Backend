@@ -2,6 +2,7 @@ from .models import (Thread, db)
 from .models import (Users, db)
 from .models import (TagLine, db)
 from .models import (Tag, db)
+from .models import (Comment, db)
 from datetime import datetime
 
 import bcrypt
@@ -72,11 +73,9 @@ class ReadOnly:
         return tag.id if tag is not None else None
 
     def get_top_comment(self, thread_id):
-        # print(Comment.query.all())
         return Comment.query.filter(Comment.thread_id == thread_id).order_by(Comment.likes.desc()).first()
 
     def get_thread_by_dupe(self):
-        # print(Thread.query.all())
         return Thread.query.filter(Thread.dupes > 1).order_by(Thread.dupes.desc()).limit(5)
 
 

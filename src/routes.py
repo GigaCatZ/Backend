@@ -162,15 +162,17 @@ def get_thread_info():
 def get_top_threads():
     topFive = []
     queried = read_queries.get_thread_by_dupe()
-    print("\n\n", queried, "\n\n")
-    comments = [read_queries.get_top_comment(thread.id) for thread in queried]
-    print("\n\n", comments, "\n\n")
+    print("\n\nqueried: ", queried, "\n\n")
+    comments = [read_queries.get_top_comment(thread.id) for thread in queried if thread != None]
+    print("\n\ncomments: ", comments, "\n\n")
 
     for thread, comment in zip(queried, comments):
+        if comment == None:
+            continue
         tmp = {
             "title": thread.question,
             "body": thread.body,
-            "answer": comment
+            "answer": comment.body
         }
         topFive.append(tmp)
 
