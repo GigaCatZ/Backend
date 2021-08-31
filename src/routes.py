@@ -132,12 +132,9 @@ def edit_thread():
 
     new_question_title = request.form.get('title')
     new_question_body = request.form.get('question-body')
-<<<<<<< HEAD
-=======
-    
+
     # Writing this as a default
     thread_id = request.form.get("thread-id")
->>>>>>> main
 
     write_queries.edit_thread(thread_id, new_question_title, new_question_body)
     return jsonify(status=True, message="Updated thread successfully")
