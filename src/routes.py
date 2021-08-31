@@ -124,13 +124,6 @@ def logout():
     else:
         return jsonify(status=False, username="", message="User hasnt logged in yet")
 
-@app.route('/api/test', methods=['GET'])
-def test():
-    try:
-        return "Login as " + str(current_user.username)
-    except (AttributeError):
-        return "Not login yet"
-    return jsonify(status=True)
 
 @app.route('/api/create_thread', methods=['GET'])
 def get_all_tags():
