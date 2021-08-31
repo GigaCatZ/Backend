@@ -64,7 +64,6 @@ class Comment(db.Model):
     comment_body = db.Column(db.Text, nullable=False)
     likes = db.Column(db.Integer, default=0)
     timestamp = db.Column(db.DateTime)
-    body = db.Column(db.Text, nullable=False)  # Can't have empty comments now, can we?
     main_comment = db.Column(db.Boolean, default=True)
 
     # A list of subcomments, not sure if this is gonna work

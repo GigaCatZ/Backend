@@ -216,7 +216,7 @@ def get_top_threads():
         tmp = {
             "title": thread.question,
             "body": thread.body,
-            "answer": comment.body
+            "answer": comment.comment_body
         }
         topFive.append(tmp)
 

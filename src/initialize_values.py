@@ -23,10 +23,8 @@ def create_tags(*args, **kwargs):
 
 @event.listens_for(Users.__table__, "after_create")
 def create_fake_users(*args, **kwargs):
-    try:
-        db.session.add(Users(sky_username="u6380496", display_name="Noah", encrypted_password="monkerules", mod=False))
-    finally:
-        db.session.commit()
+    db.session.add(Users(sky_username="u6380496", display_name="Noah", encrypted_password="monkerules", mod=False))
+    db.session.commit()
 
 
 # Just to test out my functions. Don't mind these
@@ -39,6 +37,6 @@ def create_fake_threads(*args, **kwargs):
 
 @event.listens_for(Comment.__table__, "after_create")
 def create_fake_comments(*args, **kwargs):
-    db.session.add(Comment(user_id=1, thread_id=1, likes=3, timestamp=datetime.now(), body="This is an answer #1"))
-    db.session.add(Comment(user_id=1, thread_id=2, likes=5, timestamp=datetime.now(), body="This is an answer #2"))
+    db.session.add(Comment(user_id=1, thread_id=1, likes=3, timestamp=datetime.now(), comment_body="This is an answer #1"))
+    db.session.add(Comment(user_id=1, thread_id=2, likes=5, timestamp=datetime.now(), comment_body="This is an answer #2"))
     db.session.commit()
