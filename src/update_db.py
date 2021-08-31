@@ -77,9 +77,36 @@ class WriteOnly:
         comment.comment_body = "This comment has been removed by the user."
         db.session.commit()
 
-    def upvote_thread(self, thread_id):
+    def upvote_thread(self, thread_id, username):
         thread = self.read_queries.get_thread_by_id(thread_id)
-        thread.likes += 1
+        
+        liked_thread = self.read_queries.check_thread_like(thread_id, username)
+        
+        if (liked_thread is None):
+            thread.likes += 1
+            db.session.add(ThreadLikes(thread_id=thread_id, user_id=self.read_queries.get_id_from_username(username)))
+            db.session.commit()
+            return thread, True, "Successfully liked thread!"
+
+        thread.likes -= 1
+        db.session.delete(liked_thread)
         db.session.commit()
+        return thread, False, "Successfully removed thread's like"
+
+    def upvote_comment(self, comment_id, username, is_thread):
+        comment = self.read_queries.get_comment_by_id(comment_id)
+        
+        liked_comment = self.read_queries.check_comment_like(comment_id, username)
+        
+        if (liked_comment is None):
+            comment.likes += 1
+            db.session.add(CommentLikes(comment_id=comment_id, user_id=self.read_queries.get_id_from_username(username)))
+            db.session.commit()
+            return comment, True, "Successfully liked comment!"
+
+        comment.likes -= 1
+        db.session.delete(liked_comment)
+        db.session.commit()
+        return comment, False, "Successfully removed comment's like"
 
 write_queries = WriteOnly()
