@@ -1,4 +1,4 @@
-from . import db # db comes from __init__.py
+from . import db  # db comes from __init__.py
 from flask_login import UserMixin
 
 from sqlalchemy.orm import backref
@@ -24,7 +24,7 @@ class Thread(db.Model):
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     question = db.Column(db.Text, nullable=False)
-    body = db.Column(db.Text, nullable=True) # This is new (nullable=True because body can be empty?)
+    body = db.Column(db.Text, nullable=True)  # This is new (nullable=True because body can be empty?)
     timestamp = db.Column(db.DateTime, nullable=False)
     dupes = db.Column(db.Integer, default=1)
     likes = db.Column(db.Integer, default=0)
@@ -34,7 +34,7 @@ class TagLine(db.Model):
     """Data model for TagLine"""
 
     __tablename__ = 'tag_line'
-    
+
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     thread_id = db.Column(db.Integer, db.ForeignKey('thread.id', ondelete='CASCADE'), nullable=False)
     tag = db.Column(db.Integer, db.ForeignKey('tag.id', ondelete='CASCADE'), nullable=False)
@@ -45,6 +45,7 @@ class Tag(db.Model):
     """Data model for Tags"""
 
     __tablename__ = 'tag'
+
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     course_id = db.Column(db.String(25))
     name = db.Column(db.String(100))
