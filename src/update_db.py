@@ -54,6 +54,7 @@ class WriteOnly:
 
     # combined both new_comment methods into one
     def add_comment(self, thread_id, comment_body, username, parent_id):
+        parent_id = self.read_queries.get_root_comment(parent_id)
         comment = Comment(user_id=self.read_queries.get_id_from_username(username), \
             thread_id=thread_id, comment_body=comment_body, likes=0, main_comment=(parent_id is None), timestamp=datetime.now())
         db.session.add(comment)
@@ -61,6 +62,7 @@ class WriteOnly:
         if not comment.main_comment:
             db.session.add(CommentLine(parent_comment_id=parent_id, child_comment_id=comment.id))
             db.session.commit()
+        return comment.id
 
     def edit_comment(self, comment_id, new_comment_body):
         comment = self.read_queries.get_comment_by_id(comment_id)

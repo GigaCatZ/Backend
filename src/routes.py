@@ -160,9 +160,9 @@ def new_comment():
 
     parent_id = request.form.get('parent_id')
 
-    write_queries.add_comment(thread_id, comment_body, username, parent_id) 
+    comment_id = write_queries.add_comment(thread_id, comment_body, username, parent_id) 
 
-    return jsonify(username=username, thread_id=thread_id, parent_id=parent_id, status=True, message="Comment created successfully")
+    return jsonify(comment_id=comment_id, username=username, thread_id=thread_id, parent_id=parent_id, status=True, message="Comment created successfully")
     
 @app.route('/api/edit_comment')
 def edit_comment():

@@ -23,6 +23,10 @@ class ReadOnly:
     def get_comment_by_id(self, comment_id):
         return Comment.query.filter(Comment.id == comment_id).first()
 
+    def get_root_comment(self, parent_id):
+        comment_line = CommentLine.query.filter(CommentLine.child_comment_id==parent_id).first()
+        return comment_line.parent_comment_id if comment_line is not None else parent_id
+    
     def get_user_from_id(self, user_id):
         return Users.query.get(int(user_id))
 
@@ -70,9 +74,8 @@ class ReadOnly:
 
     def jsonify_thread(self, thread):
         _, thread_id, title, date, likes, display_name = thread
-        # print('\n\n\n\n', thread_id, title, date, display_name, '\n\n\n\n')
-        return {'thread_id':thread_id, 'title':title, 'likes':likes, 'display_name':display_name, 'date':date, 'tags':self.get_courseids_from_thread(thread_id), 'comment_count': self.get_comment_count(thread_id)}
-        # return {'thread_id':thread_id, 'title':title, 'likes':likes, 'display_name':display_name, 'date':date, 'tags':self.get_courseids_from_thread(thread_id)}
+        return {'thread_id':thread_id, 'title':title, 'likes':likes, 'display_name':display_name, 'date':date, \
+            'tags':self.get_courseids_from_thread(thread_id), 'comment_count': self.get_comment_count(thread_id)}
 
     def tag_lookup(self, course_id):
         tag = Tag.query.filter(Tag.course_id == course_id).first()
