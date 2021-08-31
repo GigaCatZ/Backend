@@ -147,6 +147,10 @@ def display_thread(thread_id):
 def new_comment(thread_id):
     
     comment_body = request.form.get("comment_body")
+
+    if (len(comment_body.strip()) == 0):
+        return jsonify(status=False, message="Empty comment body")
+
     # Will change back to args, depending on how frontend chooses to send the username
     username = request.form.get('username')
 
@@ -169,7 +173,7 @@ def edit_comment(thread_id):
     new_comment_body = request.form.get("comment_body")
     
     if (len(new_comment_body.strip()) == 0):
-        return jsonify(status=False, message="Empty comment")
+        return jsonify(status=False, message="Empty comment body")
 
     # Again, defaulting to request.form.get until we have a way to request
     comment_id = request.form.get("comment_id")
