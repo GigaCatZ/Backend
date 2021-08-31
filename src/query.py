@@ -72,6 +72,18 @@ class ReadOnly:
         else:
             return None, False, "Not valid order"
 
+    def check_thread_like(self, thread_id, username):
+        return ThreadLikes.query.filter(ThreadLikes.thread_id==thread_id).filter(ThreadLikes.user_id==self.get_id_from_username(username)).first()
+
+    def get_thread_like_count(self, thread_id):
+        return Thread.query.filter(Thread.id==thread_id).first().likes
+    
+    def check_comment_like(self, comment_id, username):
+        return CommentLikes.query.filter(CommentLikes.comment_id==comment_id).filter(CommentLikes.user_id==self.get_id_from_username(username)).first()
+
+    def get_comment_like_count(self, comment_id):
+        return Comment.query.filter(Comment.id==comment_id).first().likes
+    
     def jsonify_thread(self, thread):
         _, thread_id, title, date, likes, display_name = thread
         return {'thread_id':thread_id, 'title':title, 'likes':likes, 'display_name':display_name, 'date':date, \
@@ -90,7 +102,7 @@ class ReadOnly:
     def get_comments_of_thread(self, thread_id):
         queried = Comment.query.filter(Comment.thread_id == thread_id).filter(Comment.main_comment).order_by(Comment.likes.desc()).all()
         return [{'sender': self.get_user_from_id(comment.user_id).display_name, 'timestamp': comment.timestamp, 'body': comment.comment_body, \
-            'likes' : comment.likes, 'replies' : self.get_all_replies(comment.id), 'comment_id' : comment.id } for comment in queried]
+            'likes' : comment.likes, 'replies' : self.get_all_replies(comment.id), 'comment_id' : comment.id , 'reply' : False} for comment in queried]
 
     def get_all_replies(self, parent_id):
         queried = Comment.query.join(CommentLine, CommentLine.child_comment_id==Comment.id).filter(CommentLine.parent_comment_id == parent_id).all()

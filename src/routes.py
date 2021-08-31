@@ -206,6 +206,22 @@ def get_all_threads():
     threads, status, message = read_queries.get_thread_by_order("SEARCH")
     return jsonify(threads=threads, status=status, message=message)
 
+@app.route("/api/like_thread", methods=["POST"])
+def like_thread():
+    username = request.form.get('username')
+    thread_id = request.form.get('thread_id')
+    if username is None: return jsonify(status=False, liked_thread=False, message="User is not logged in!", thread_id=thread_id, new_likes=read_queries.get_thread_like_count(thread_id), username=username)
+    thread, liked, message = write_queries.upvote_thread(thread_id, username)
+    return jsonify(status=True, liked_thread=liked, message=message, thread_id=thread.id, new_likes=thread.likes, username=username)
+
+@app.route("/api/like_comment", methods=["POST"])
+def like_comment():
+    username = request.form.get('username')
+    comment_id = request.form.get('comment_id')
+    if username is None: return jsonify(status=False, liked_thread=False, message="User is not logged in!", comment_id=comment_id, new_likes=read_queries.get_comment_like_count(comment_id), username=username)
+    comment, liked, message = write_queries.upvote_thread(comment_id, username)
+    return jsonify(status=True, liked_thread=liked, message=message, comment_id=comment.id, new_likes=comment.likes, username=username)
+
 @app.route("/api/faq", methods=["GET"])
 def get_top_threads():
     topFive = []
