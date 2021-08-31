@@ -1,6 +1,7 @@
 from . import db  # db comes from __init__.py
 from flask_login import UserMixin
 
+from sqlalchemy.orm import backref
 
 class Users(UserMixin, db.Model):
     """DUMMY Data model for Users"""
@@ -20,7 +21,8 @@ class Thread(db.Model):
     __tablename__ = 'thread'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     question = db.Column(db.Text, nullable=False)
     body = db.Column(db.Text, nullable=True)  # This is new (nullable=True because body can be empty?)
     timestamp = db.Column(db.DateTime, nullable=False)
@@ -34,8 +36,9 @@ class TagLine(db.Model):
     __tablename__ = 'tag_line'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    thread_id = db.Column(db.Integer, db.ForeignKey('thread.id'), nullable=False)
-    tag = db.Column(db.Integer, db.ForeignKey('tag.id'), nullable=False)
+    thread_id = db.Column(db.Integer, db.ForeignKey('thread.id', ondelete='CASCADE'), nullable=False)
+    tag = db.Column(db.Integer, db.ForeignKey('tag.id', ondelete='CASCADE'), nullable=False)
+    tagline_to_tag = db.relationship('Tag', backref=backref('children', passive_deletes=True))
 
 
 class Tag(db.Model):
@@ -55,9 +58,21 @@ class Comment(db.Model):
     __tablename__ = 'comment'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    thread_id = db.Column(db.Integer, db.ForeignKey('thread.id'), nullable=False)
+
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    thread_id = db.Column(db.Integer, db.ForeignKey('thread.id', ondelete='CASCADE'), nullable=False)
+    comment_body = db.Column(db.Text, nullable=False)
     likes = db.Column(db.Integer, default=0)
-    parent_id = db.Column(db.Integer, db.ForeignKey('comment.id'))
     timestamp = db.Column(db.DateTime)
     body = db.Column(db.Text, nullable=False)  # Can't have empty comments now, can we?
+    main_comment = db.Column(db.Boolean, default=True)
+
+    # A list of subcomments, not sure if this is gonna work
+    subcomments = []
+
+class CommentLine(db.Model):
+    __tablename__ = 'comment_line'
+    
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    parent_comment_id = db.Column(db.Integer, db.ForeignKey('comment.id', ondelete='CASCADE'), nullable=False)
+    child_comment_id = db.Column(db.Integer, db.ForeignKey('comment.id', ondelete='CASCADE'), nullable=False)

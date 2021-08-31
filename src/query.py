@@ -1,11 +1,6 @@
-from .models import (Thread, db)
-from .models import (Users, db)
-from .models import (TagLine, db)
-from .models import (Tag, db)
-from .models import (Comment, db)
-from datetime import datetime
+from .models import *
+from datetime import datetime, timedelta
 
-import bcrypt
 from flask import jsonify
 
 class ReadOnly:
@@ -24,6 +19,9 @@ class ReadOnly:
     def get_user_from_username(self, username):
         return Users.query.filter(Users.sky_username == username).first()
     
+    def get_comment_by_id(self, comment_id):
+        return Comment.query.filter(Comment.id == comment_id).first()
+
     def get_user_from_id(self, user_id):
         return Users.query.get(int(user_id))
 
@@ -34,10 +32,10 @@ class ReadOnly:
         return [f'{course.course_id} | {course.name}' for course in queried]
 
     def display_all_tags(self):
-        return self.display_tags(Tag.query.filter(Tag.id != 1))
+        return self.display_tags(Tag.query)
 
     def display_top_tags(self):
-        return self.display_tags(Tag.query.filter(Tag.id != 1).order_by(Tag.count.desc()).limit(10))
+        return self.display_tags(Tag.query.order_by(Tag.count.desc()).limit(10))
     
     def get_courseids_from_thread(self, thread_id):
         queried = TagLine.query.filter(TagLine.thread_id == thread_id).join(Tag, TagLine.tag==Tag.id).add_column(Tag.course_id).all()
@@ -47,19 +45,22 @@ class ReadOnly:
         return Tag.query.filter(Tag.id == tag_id).first()
 
     def get_tags_from_thread(self, thread_id):
-        queried = TagLine.query.filter(TagLine.tag != 1).filter(TagLine.thread_id == thread_id).join(Tag, TagLine.tag==Tag.id).all()
+        queried = TagLine.query.filter(TagLine.thread_id == thread_id).join(Tag, TagLine.tag==Tag.id).all()
         tags = set()
+        []
         for tag in queried:
-            tag_info = self.get_tag_from_id(tag.id)
+            tag_info = self.get_tag_from_id(tag.tag)
             tags |= {f'{tag_info.course_id} | {tag_info.name}'}
         return list(tags)
 
     def get_thread_by_order(self, order):
-        if order is not None and order == "RECENT":
+        if order is not None:
             queried = Thread.query.join(Users, Users.id==Thread.user_id)\
-                .add_columns(Thread.id, Thread.question, Thread.timestamp, Thread.likes, Users.display_name)\
-                    .order_by(Thread.timestamp.desc()).limit(10)
-            return [self.jsonify_thread(thread) for thread in queried.all()], "Successfully queried tags and threads"
+                .add_columns(Thread.id, Thread.question, Thread.timestamp, Thread.likes, Users.display_name)
+            if order == "RECENT": queried = queried.order_by(Thread.timestamp.desc())
+            elif order == "LIKES": queried = queried.order_by(Thread.likes.desc())
+            elif order == "POPULAR": queried.filter(Thread.timestamp >= (datetime.now() - timedelta(days=31))).order_by(Thread.likes.desc())
+            return [self.jsonify_thread(thread) for thread in queried.limit(10).all()], "Successfully queried tags and threads"
         else:
             return None, "Not valid order"
 
@@ -78,5 +79,14 @@ class ReadOnly:
     def get_thread_by_dupe(self):
         return Thread.query.filter(Thread.dupes > 1).order_by(Thread.dupes.desc()).limit(5)
 
+    def get_comments_of_thread(self, thread_id):
+        queried = Comment.query.filter(Comment.thread_id == thread_id).filter(Comment.main_comment).order_by(Comment.likes.desc()).all()
+        return [{'sender': self.get_user_from_id(comment.user_id).display_name, 'timestamp': comment.timestamp, 'body': comment.comment_body, \
+            'likes' : comment.likes, 'replies' : self.get_all_replies(comment.id), 'comment_id' : comment.id } for comment in queried]
+
+    def get_all_replies(self, parent_id):
+        queried = Comment.query.join(CommentLine, CommentLine.child_comment_id==Comment.id).filter(CommentLine.parent_comment_id == parent_id).all()
+        return [{'sender': self.get_user_from_id(comment.user_id).display_name, 'timestamp': comment.timestamp, 'body': comment.comment_body, \
+            'likes' : comment.likes, 'comment_id' : comment.id } for comment in queried]
 
 read_queries = ReadOnly()
