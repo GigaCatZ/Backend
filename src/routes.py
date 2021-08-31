@@ -127,12 +127,15 @@ def create_thread():
 
 
 # will test this later once we confirm how frontend gonna do this
-@app.route('/threads/<int:thread_id>/edit', methods=['POST'])
-def edit_thread(thread_id):
+@app.route('/api/edit_thread', methods=['POST'])
+def edit_thread():
 
     new_question_title = request.form.get('title')
     new_question_body = request.form.get('question-body')
     
+    # Writing this as a default
+    thread_id = request.form.get("thread-id")
+
     write_queries.edit_thread(thread_id, new_question_title, new_question_body)
     return jsonify(status=True, message="Updated thread successfully")
 
@@ -143,8 +146,8 @@ def display_thread(thread_id):
     return jsonify(title=thread.question, body=thread.body, user=thread.user_id, date_asked=thread.timestamp)
 
 # COMMENT ATTEMPT BEGINS HERE (I'm just sticking with the format I used earlier, can change if frontend doesn't like it)
-@app.route('/threads/<int:thread_id>/comment')
-def new_comment(thread_id):
+@app.route('/api/new_comment')
+def new_comment():
     
     comment_body = request.form.get("comment_body")
 
@@ -153,9 +156,11 @@ def new_comment(thread_id):
 
     # Will change back to args, depending on how frontend chooses to send the username
     username = request.form.get('username')
+    thread_id = request.form.get('thread_id')
 
     # Not sure how frontend is gonna do it, but basically just checks to see if the comment is a reply or not
     is_reply = request.form.get('is_reply')
+
 
     if (is_reply):
         # Again, just defaulting to request.form.get until we have a way to request
@@ -167,8 +172,8 @@ def new_comment(thread_id):
     write_queries.new_comment(thread_id, comment_body, username) 
     return jsonify(status=True, message="Comment created successfully")
     
-@app.route('/threads/<int: thread_id>/edit_comment')
-def edit_comment(thread_id):
+@app.route('/api/edit_comment')
+def edit_comment():
     
     new_comment_body = request.form.get("comment_body")
     
@@ -180,8 +185,8 @@ def edit_comment(thread_id):
     write_queries.edit_comment(comment_id, new_comment_body)
     return jsonify(status=True, message="Reply created successfully")
 
-@app.route("/threads/<int:thread_id>/delete_comment")
-def delete_comment(thread_id):
+@app.route("/api/delete_comment")
+def delete_comment():
 
     # Again, defaulting to request.form.get until we have a way to request
     comment_id = request.form.get("comment_id")
