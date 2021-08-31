@@ -1,5 +1,6 @@
 from .models import (Thread, db)
 from .models import (Users, db)
+from .models import (Comment, db)
 from .models import (TagLine, db)
 from .models import (Tag, db)
 from datetime import datetime
@@ -52,6 +53,37 @@ class WriteOnly:
         thread.question = new_title
         thread.body = new_body
 
+        db.session.commit()
+    
+    def new_comment(self, thread_id, comment_body, username):
+        comment = Comment(user_id=username, thread_id=thread_id, comment_body=comment_body, timestamp=datetime.now())
+        db.session.add(comment)
+        db.session.commit()
+
+    def new_comment_reply(self, thread_id, parent_comment_id, comment_body, username):
+        comment = Comment(user_id=username, thread_id=thread_id, comment_body=comment_body, timestamp=datetime.now())
+
+        # Not sure if I should also add this individual comment to the db.session but, we'll see!?
+        parent_comment = self.read_queries.get_comment_by_id(parent_comment_id)
+        parent_comment.subcomments.append(comment)
+        db.session.commit()    
+
+    def edit_comment(self, comment_id, new_comment_body):
+        comment = self.read_queries.get_comment_by_id(comment_id)
+        comment.comment_body = new_comment_body
+
+        db.session.commit()
+
+    def delete_comment(self, comment_id):
+        comment = self.read_queries.get_comment_by_id(comment_id)
+
+        # Would be nice if frontend could make this italic or something
+        comment.comment_body = "This comment has been removed by the user."
+        db.session.commit()
+
+    def upvote_thread(self, thread_id):
+        thread = self.read_queries.get_thread_by_id(thread_id)
+        thread.likes += 1
         db.session.commit()
     
 read_queries = ReadOnly()

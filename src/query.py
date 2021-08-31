@@ -1,5 +1,6 @@
 from .models import (Thread, db)
 from .models import (Users, db)
+from .models import (Comment, db)
 from .models import (TagLine, db)
 from .models import (Tag, db)
 from datetime import datetime
@@ -23,6 +24,9 @@ class ReadOnly:
     def get_user_from_username(self, username):
         return Users.query.filter(Users.sky_username == username).first()
     
+    def get_comment_by_id(self, comment_id):
+        return Comment.query.filter(Comment.id == comment_id).first()
+
     def get_user_from_id(self, user_id):
         return Users.query.get(int(user_id))
 
@@ -37,7 +41,7 @@ class ReadOnly:
 
     def display_top_tags(self):
         return self.display_tags(Tag.query.filter(Tag.id != 1).order_by(Tag.count.desc()).limit(10))
-    
+
     def get_courseids_from_thread(self, thread_id):
         queried = TagLine.query.filter(TagLine.thread_id == thread_id).join(Tag, TagLine.tag==Tag.id).add_column(Tag.course_id).all()
         return [tag[-1] for tag in queried]

@@ -7,6 +7,8 @@ from sqlalchemy.exc import IntegrityError
 
 from .query import read_queries
 from .update_db import write_queries
+from .models import Thread, Comment
+
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -140,6 +142,47 @@ def display_thread(thread_id):
     thread = Thread.query.filter(Thread.id == thread_id)
     return jsonify(title=thread.question, body=thread.body, user=thread.user_id, date_asked=thread.timestamp)
 
+# COMMENT ATTEMPT BEGINS HERE (I'm just sticking with the format I used earlier, can change if frontend doesn't like it)
+@app.route('/threads/<int:thread_id>/comment')
+def new_comment(thread_id):
+    
+    comment_body = request.form.get("comment_body")
+    # Will change back to args, depending on how frontend chooses to send the username
+    username = request.form.get('username')
+
+    # Not sure how frontend is gonna do it, but basically just checks to see if the comment is a reply or not
+    is_reply = request.form.get('is_reply')
+
+    if (is_reply):
+        # Again, just defaulting to request.form.get until we have a way to request
+        parent_comment_id = request.form.get('parent_comment_id')
+        write_queries.new_comment_reply(thread_id, parent_comment_id, comment_body, username)
+        return jsonify(status=True, message="Reply created successfully")
+
+    # Yeah, the function name is the same, probably not very wise...
+    write_queries.new_comment(thread_id, comment_body, username) 
+    return jsonify(status=True, message="Comment created successfully")
+    
+@app.route('/threads/<int: thread_id>/edit_comment')
+def edit_comment(thread_id):
+    
+    new_comment_body = request.form.get("comment_body")
+    
+    if (len(new_comment_body.strip()) == 0):
+        return jsonify(status=False, message="Empty comment")
+
+    # Again, defaulting to request.form.get until we have a way to request
+    comment_id = request.form.get("comment_id")
+    write_queries.edit_comment(comment_id, new_comment_body)
+    return jsonify(status=True, message="Reply created successfully")
+
+@app.route("/threads/<int:thread_id>/delete_comment")
+def delete_comment(thread_id):
+
+    # Again, defaulting to request.form.get until we have a way to request
+    comment_id = request.form.get("comment_id")
+    write_queries.delete_comment(comment_id)
+    return jsonify(status=True, message="Comment deleted successfully")
 
 @app.route('/api/home', methods=['POST'])
 def homepage():

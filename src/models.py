@@ -26,7 +26,6 @@ class Thread(db.Model):
     timestamp = db.Column(db.DateTime, nullable=False)
     dupes = db.Column(db.Integer, default=1)
     likes = db.Column(db.Integer, default=0)
-    
 
 
 class TagLine(db.Model):
@@ -57,6 +56,10 @@ class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     thread_id = db.Column(db.Integer, db.ForeignKey('thread.id'), nullable=False)
+    comment_body = db.Column(db.Text, nullable=False)
     likes = db.Column(db.Integer, default=0)
     parent_id = db.Column(db.Integer, db.ForeignKey('comment.id'))
     timestamp = db.Column(db.DateTime)
+    
+    # A list of subcomments, not sure if this is gonna work
+    subcomments = []
