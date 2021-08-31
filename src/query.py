@@ -107,6 +107,6 @@ class ReadOnly:
     def get_all_replies(self, parent_id):
         queried = Comment.query.join(CommentLine, CommentLine.child_comment_id==Comment.id).filter(CommentLine.parent_comment_id == parent_id).all()
         return [{'sender': self.get_user_from_id(comment.user_id).display_name, 'timestamp': comment.timestamp, 'body': comment.comment_body, \
-            'likes' : comment.likes, 'comment_id' : comment.id } for comment in queried]
+            'likes' : comment.likes, 'comment_id' : comment.id , 'reply' : False } for comment in queried]
 
 read_queries = ReadOnly()
