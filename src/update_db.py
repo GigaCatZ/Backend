@@ -95,7 +95,7 @@ class WriteOnly:
         db.session.commit()
         return thread, False, "Successfully removed thread's like"
 
-    def upvote_comment(self, comment_id, username, is_thread):
+    def upvote_comment(self, comment_id, username):
         comment = self.read_queries.get_comment_by_id(comment_id)
         
         liked_comment = self.read_queries.check_comment_like(comment_id, username)

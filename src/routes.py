@@ -253,9 +253,9 @@ def like_thread():
 def like_comment():
     username = request.form.get('username')
     comment_id = request.form.get('comment_id')
-    if username is None: return jsonify(status=False, liked_thread=False, message="User is not logged in!", comment_id=comment_id, new_likes=read_queries.get_comment_like_count(comment_id), username=username)
-    comment, liked, message = write_queries.upvote_thread(comment_id, username)
-    return jsonify(status=True, liked_thread=liked, message=message, comment_id=comment.id, new_likes=comment.likes, username=username)
+    if username is None: return jsonify(status=False, liked_comment=False, message="User is not logged in!", comment_id=comment_id, new_likes=read_queries.get_comment_like_count(comment_id), username=username)
+    comment, liked, message = write_queries.upvote_comment(comment_id, username)
+    return jsonify(status=True, liked_comment=liked, message=message, comment_id=comment.id, new_likes=comment.likes, username=username)
 
 
 @app.route("/api/user_info", methods=["POST"])
