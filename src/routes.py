@@ -17,7 +17,6 @@ login_manager.init_app(app)
 def load_user(user_id):
     return read_queries.get_user_from_id(user_id)
 
-
 @app.route('/api/search', methods=['POST'])
 def search():
     def filter_by_tags(thread, search_tags):
@@ -259,6 +258,14 @@ def like_comment():
     return jsonify(status=True, liked_thread=liked, message=message, comment_id=comment.id, new_likes=comment.likes, username=username)
 
 
+@app.route("/api/user_info", methods=["POST"])
+def update_info():
+    username = request.form.get('sky_username')
+    password = request.form.get('password')
+    if not bcrypt.checkpw(password.encode('utf8'), read_queries.get_encrypted_password(username)):
+        return jsonify(status=False, message="Incorrect password")
+
+
 # gets top 5 threads by dupes for FAQ page
 @app.route("/api/faq", methods=["GET"])
 def get_top_threads():
@@ -280,7 +287,6 @@ def get_top_threads():
 
     res = {"response": topFive}
     return jsonify(res)
-
 
 # gets all of the available tags
 @app.route("/api/get_tags", methods=["GET"])

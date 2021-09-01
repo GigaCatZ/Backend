@@ -54,12 +54,11 @@ class ReadOnly:
 
     def get_tags_from_thread(self, thread_id):
         queried = TagLine.query.filter(TagLine.thread_id == thread_id).join(Tag, TagLine.tag==Tag.id).all()
-        tags = set()
-        []
+        tags = list()
         for tag in queried:
             tag_info = self.get_tag_from_id(tag.tag)
-            tags |= {f'{tag_info.course_id} | {tag_info.name}'}
-        return list(tags)
+            tags.append(f'{tag_info.course_id} | {tag_info.name}')
+        return tags
 
     def get_thread_by_order(self, order):
         if order is not None and order in {"RECENT", "LIKES", "POPULAR", "SEARCH"}:

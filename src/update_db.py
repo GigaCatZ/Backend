@@ -8,11 +8,14 @@ class WriteOnly:
     def __init__(self):
         self.read_queries = ReadOnly()
 
-    def register_client(self,sky_username, email, display_name, password):
+    def register_client(self,sky_username, display_name, password, email):
         passwordToByte = str.encode(password)
         hash_password = bcrypt.hashpw(passwordToByte, bcrypt.gensalt(10))
         db.session.add(Users(sky_username=sky_username, display_name=display_name, mod=False, encrypted_password=hash_password, email=email))
         db.session.commit()
+
+    # def update_user(self, display_name, new_password):
+        
 
     # Thread attempt begins here
     def add_thread(self, thread_title, username, thread_body, tags):
