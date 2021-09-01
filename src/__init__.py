@@ -12,7 +12,8 @@ def create_app(test_config):
     db.init_app(app)
 
     with app.app_context():
-        from . import routes, initialize_values
+        from .database import initialize_values
+        from .routes import comments_api, threads_api, pages_api, user_security
 
         db.create_all() # Create database tables if not already there!
 

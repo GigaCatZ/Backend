@@ -1,8 +1,4 @@
-from .models import (Tag, db)
-from .models import (Thread, db)
-from .models import (Users, db)
-# from .models import (TagLine, db)
-from .models import (Comment, db)
+from .models import *
 from sqlalchemy import (event, exc)
 from datetime import datetime
 

@@ -1,4 +1,4 @@
-from . import db  # db comes from __init__.py
+from .. import db  # db comes from __init__.py
 from flask_login import UserMixin
 
 from sqlalchemy.orm import backref
