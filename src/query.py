@@ -109,4 +109,7 @@ class ReadOnly:
         return [{'sender': self.get_user_from_id(comment.user_id).display_name, 'timestamp': comment.timestamp, 'body': comment.comment_body, \
             'likes' : comment.likes, 'comment_id' : comment.id , 'reply' : False } for comment in queried]
 
+    def get_all_tags(self):
+        return Tag.query.all()
+
 read_queries = ReadOnly()

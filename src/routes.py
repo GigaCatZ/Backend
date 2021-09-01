@@ -16,8 +16,8 @@ login_manager.init_app(app)
 @login_manager.user_loader
 def load_user(user_id):
     return read_queries.get_user_from_id(user_id)
-    
-    
+
+
 @app.route('/api/search', methods=['POST'])
 def search():
     def filter_by_tags(thread, search_tags):
@@ -32,7 +32,7 @@ def search():
     search_input = request.form.get('search_input')
     type_search = request.form.get('type_search')
     filter_function = filter_by_title
-    
+
     all_types = {'tags': filter_by_tags, 'title': filter_by_title, 'display_name': filter_by_display_name}
     if (type_search != None):
         type_search_lower_case = type_search.lower()
@@ -43,7 +43,7 @@ def search():
                     search_input = search_input.split('|')[0].strip()
                 break;
         del type_search_lower_case
-    
+
     thread_search = read_queries.get_thread_by_order('SEARCH')
     search_input_lower_case = search_input.lower()
     result = [thread for thread in thread_search[0] if (filter_function(thread, search_input_lower_case))]
@@ -55,7 +55,7 @@ def search():
     del thread_search
     del filter_function
     return jsonify(search_result=result)
-            
+
 
 @app.route('/api/checkuser', methods=['POST'])
 def createuser():
@@ -181,7 +181,7 @@ def display_thread(thread_id):
 # COMMENT ATTEMPT BEGINS HERE (I'm just sticking with the format I used earlier, can change if frontend doesn't like it)
 @app.route('/api/new_comment', methods=['POST'])
 def new_comment():
-    
+
     comment_body = request.form.get("comment_body")
 
     if (comment_body is None or len(comment_body.strip()) == 0):
@@ -193,15 +193,15 @@ def new_comment():
 
     parent_id = request.form.get('parent_id')
 
-    comment_id = write_queries.add_comment(thread_id, comment_body, username, parent_id) 
+    comment_id = write_queries.add_comment(thread_id, comment_body, username, parent_id)
 
     return jsonify(comment_id=comment_id, username=username, thread_id=thread_id, parent_id=parent_id, status=True, message="Comment created successfully")
-    
+
 @app.route('/api/edit_comment')
 def edit_comment():
-    
+
     new_comment_body = request.form.get("comment_body")
-    
+
     if (len(new_comment_body.strip()) == 0):
         return jsonify(status=False, message="Empty comment body")
 
@@ -251,6 +251,8 @@ def like_comment():
     comment, liked, message = write_queries.upvote_thread(comment_id, username)
     return jsonify(status=True, liked_thread=liked, message=message, comment_id=comment.id, new_likes=comment.likes, username=username)
 
+
+# gets top 5 threads by dupes for FAQ page
 @app.route("/api/faq", methods=["GET"])
 def get_top_threads():
     topFive = []
@@ -272,3 +274,9 @@ def get_top_threads():
     res = {"response": topFive}
     return jsonify(res)
 
+
+# gets all of the available tags
+@app.route("/api/get_tags", methods=["GET"])
+def send_all_tags():
+    queried = read_queries.get_all_tags()
+    return jsonify(tags=[{"id": tag.id, "course_id": tag.course_id, "name": tag.name, "count": tag.count} for tag in queried if tag != None])
