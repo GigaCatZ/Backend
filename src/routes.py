@@ -253,10 +253,12 @@ def like_thread():
 def like_comment():
     username = request.form.get('username')
     comment_id = request.form.get('comment_id')
-    if username == "": return jsonify(status=False, liked_comment=False, message="User is not logged in!", comment_id=comment_id, new_likes=read_queries.get_comment_like_count(comment_id), username=username)
-    comment, liked, message = write_queries.upvote_comment(comment_id, username)
-    return jsonify(status=True, liked_comment=liked, message=message, comment_id=comment.id, new_likes=comment.likes, username=username)
-
+    try:
+        if username == "": return jsonify(status=False, liked_comment=False, message="User is not logged in!", comment_id=comment_id, new_likes=read_queries.get_comment_like_count(comment_id), username=username)
+        comment, liked, message = write_queries.upvote_comment(comment_id, username)
+        return jsonify(status=True, liked_comment=liked, message=message, comment_id=comment.id, new_likes=comment.likes, username=username)
+    except(AttributeError):
+        jsonify(status=False, liked_comment=None, message="Comment does not exist", comment_id=None, new_likes=None, username=None)
 
 @app.route("/api/user_info", methods=["POST"])
 def update_info():
