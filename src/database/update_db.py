@@ -14,8 +14,13 @@ class WriteOnly:
         db.session.add(Users(sky_username=sky_username, display_name=display_name, mod=False, encrypted_password=hash_password, email=email))
         db.session.commit()
 
-    # def update_user(self, display_name, new_password):
-        
+    def update_user(self, username, display_name, password):
+        user = self.read_queries.get_user_from_username(username)
+        if display_name != "": user.display_name=display_name
+        if password != "":
+            hash_password = bcrypt.hashpw(str.encode(password), bcrypt.gensalt(10))
+            user.encrypted_password = hash_password
+        db.session.commit()
 
     # Thread attempt begins here
     def add_thread(self, thread_title, username, thread_body, tags):
