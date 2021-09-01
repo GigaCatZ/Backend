@@ -8,10 +8,10 @@ class WriteOnly:
     def __init__(self):
         self.read_queries = ReadOnly()
 
-    def register_client(self,sky_username, display_name, password):
+    def register_client(self,sky_username, email, display_name, password):
         passwordToByte = str.encode(password)
         hash_password = bcrypt.hashpw(passwordToByte, bcrypt.gensalt(10))
-        db.session.add(Users(sky_username=sky_username, display_name=display_name, mod=False, encrypted_password=hash_password))
+        db.session.add(Users(sky_username=sky_username, display_name=display_name, mod=False, encrypted_password=hash_password, email=email))
         db.session.commit()
 
     # Thread attempt begins here
@@ -78,8 +78,7 @@ class WriteOnly:
         db.session.commit()
 
     def upvote_thread(self, thread_id, username):
-        thread = self.read_queries.get_thread_by_id(thread_id)
-        
+        thread = self.read_queries.get_thread_by_id(thread_id)        
         liked_thread = self.read_queries.check_thread_like(thread_id, username)
         
         if (liked_thread is None):

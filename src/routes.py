@@ -102,10 +102,11 @@ def register():
     display_name = request.form.get('display_name')
     password = request.form.get('password')
     username = request.form.get('sky_username')
+    email = request.form.get('email')
 
     if (username is not None and password is not None and display_name is not None):
         try:
-            write_queries.register_client(username, display_name, password)
+            write_queries.register_client(username, display_name, password, email)
             return jsonify(username=username, status=True, message="Registered successfully!")
         except (IntegrityError):
             return jsonify(username=username, status=False, message="Username or Display Name has already been taken")
@@ -185,7 +186,7 @@ def new_comment():
     comment_body = request.form.get("comment_body")
 
     if (comment_body is None or len(comment_body.strip()) == 0):
-        return jsonify(status=False, message="Empty comment body")
+        return jsonify(status=False, message="Empty comment body", thread_id=None, parent_id=None, comment_id=None, username=None)
 
     # Will change back to args, depending on how frontend chooses to send the username
     username = request.form.get('username')
@@ -193,9 +194,11 @@ def new_comment():
 
     parent_id = request.form.get('parent_id')
 
-    comment_id = write_queries.add_comment(thread_id, comment_body, username, parent_id)
-
-    return jsonify(comment_id=comment_id, username=username, thread_id=thread_id, parent_id=parent_id, status=True, message="Comment created successfully")
+    try:
+        comment_id = write_queries.add_comment(thread_id, comment_body, username, parent_id)
+        return jsonify(comment_id=comment_id, username=username, thread_id=thread_id, parent_id=parent_id, status=True, message="Comment created successfully")
+    except(IntegrityError):
+        return jsonify(status=False, message="Parent comment does not exist", thread_id=None, parent_id=None, comment_id=None, username=None)
 
 @app.route('/api/edit_comment')
 def edit_comment():
@@ -228,20 +231,24 @@ def homepage():
 @app.route('/api/getthread', methods=['POST'])
 def get_thread_info():
     thread = read_queries.get_thread_by_id(request.form.get('thread_id'))
+    username = request.form.get('sky_username')
     try:
-        return jsonify(status=True, thread_id=thread.id, author=read_queries.get_user_from_id(thread.user_id).display_name, title=thread.question,\
-            body=thread.body, timestamp=thread.timestamp, likes=thread.likes, comments=read_queries.get_comments_of_thread(thread.id), tags=read_queries.get_tags_from_thread(thread.id))
+        return jsonify(status=True, thread_id=thread.id, author=read_queries.get_user_from_id(thread.user_id).display_name, title=thread.question, is_liked=(read_queries.check_thread_like(thread.id, username) is not None),\
+            body=thread.body, timestamp=thread.timestamp, likes=thread.likes, comments=read_queries.get_comments_of_thread(thread.id, username), tags=read_queries.get_tags_from_thread(thread.id))
     except(AttributeError):
-        return jsonify(status=False, thread_id=None, author=None, title=None, body=None, timestamp=None, likes=None, comments=None, tags=None)
+        return jsonify(status=False, thread_id=None, author=None, title=None, body=None, timestamp=None, likes=None, comments=None, tags=None, is_liked=False)
 
 
 @app.route("/api/like_thread", methods=["POST"])
 def like_thread():
     username = request.form.get('username')
     thread_id = request.form.get('thread_id')
-    if username is None: return jsonify(status=False, liked_thread=False, message="User is not logged in!", thread_id=thread_id, new_likes=read_queries.get_thread_like_count(thread_id), username=username)
-    thread, liked, message = write_queries.upvote_thread(thread_id, username)
-    return jsonify(status=True, liked_thread=liked, message=message, thread_id=thread.id, new_likes=thread.likes, username=username)
+    try:
+        if username is None: return jsonify(status=False, liked_thread=False, message="User is not logged in!", thread_id=thread_id, new_likes=read_queries.get_thread_like_count(thread_id), username=username)
+        thread, liked, message = write_queries.upvote_thread(thread_id, username)
+        return jsonify(status=True, liked_thread=liked, message=message, thread_id=thread.id, new_likes=thread.likes, username=username)
+    except(AttributeError):
+        jsonify(status=False, liked_thread=None, message="Thread does not exist", thread_id=None, new_likes=None, username=None)
 
 @app.route("/api/like_comment", methods=["POST"])
 def like_comment():
