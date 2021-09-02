@@ -95,7 +95,8 @@ class ReadOnly:
         return tag.id if tag is not None else None
 
     def get_top_comment(self, thread_id):
-        return Comment.query.filter(Comment.thread_id == thread_id).order_by(Comment.likes.desc()).first()
+        # Nawat, if you're reading this, filtering by Comment.main_comment was added at the request of PK since this function could return the most upvoted subcomment
+        return Comment.query.filter(Comment.thread_id == thread_id).filter(Comment.main_comment).order_by(Comment.likes.desc()).first()
 
     def get_thread_by_dupe(self):
         return Thread.query.filter(Thread.dupes > 1).order_by(Thread.dupes.desc()).limit(5)
@@ -103,12 +104,12 @@ class ReadOnly:
     def get_comments_of_thread(self, thread_id, username):
         queried = Comment.query.filter(Comment.thread_id == thread_id).filter(Comment.main_comment).order_by(Comment.likes.desc()).all()
         return [{'sender': self.get_user_from_id(comment.user_id).display_name, 'timestamp': comment.timestamp, 'body': comment.comment_body, 'is_liked': self.check_comment_like(comment.id, username) is not None, \
-            'likes' : comment.likes, 'replies' : self.get_all_replies(comment.id, username), 'comment_id' : comment.id , 'reply' : False} for comment in queried]
+                'likes' : comment.likes, 'replies' : self.get_all_replies(comment.id, username), 'comment_id' : comment.id , 'reply' : False, 'deleted' : comment.deleted} for comment in queried]
 
     def get_all_replies(self, parent_id, username):
         queried = Comment.query.join(CommentLine, CommentLine.child_comment_id==Comment.id).filter(CommentLine.parent_comment_id == parent_id).all()
         return [{'sender': self.get_user_from_id(comment.user_id).display_name, 'timestamp': comment.timestamp, 'body': comment.comment_body, \
-            'is_liked' : self.check_comment_like(comment.id, username) is not None, 'likes' : comment.likes, 'comment_id' : comment.id , 'reply' : False } for comment in queried]
+                'is_liked' : self.check_comment_like(comment.id, username) is not None, 'likes' : comment.likes, 'comment_id' : comment.id , 'reply' : False, 'deleted' : comment.deleted } for comment in queried]
 
     def get_all_tags(self):
         return Tag.query.all()

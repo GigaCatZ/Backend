@@ -31,25 +31,33 @@ def new_comment():
 @app.route('/api/edit_comment')
 def edit_comment():
 
-    new_comment_body = request.form.get("comment_body")
-
-    if (len(new_comment_body.strip()) == 0):
-        return jsonify(status=False, message="Empty comment body")
-
-    # Again, defaulting to request.form.get until we have a way to request
     comment_id = request.form.get("comment_id")
-    write_queries.edit_comment(comment_id, new_comment_body)
-    return jsonify(status=True, message="Reply created successfully")
+    username = request.form.get("sky_username")
+    comment = read_queries.get_comment_by_id(comment_id)
+    new_comment_body = request.form.get("comment_body")
+    
+    if (username == comment.user_id):
+        if (len(new_comment_body.strip()) == 0):
+            return jsonify(status=False, message="Empty comment body")
 
+        write_queries.edit_comment(comment_id, new_comment_body)
+        return jsonify(status=True, message="Reply created successfully")
+    
+    return jsonify(status=False, message="Unable to edit: user is not the owner of the comment")
 
 @app.route("/api/delete_comment")
 def delete_comment():
 
     # Again, defaulting to request.form.get until we have a way to request
     comment_id = request.form.get("comment_id")
-    write_queries.delete_comment(comment_id)
-    return jsonify(status=True, message="Comment deleted successfully")
+    username = request.form.get("sky_username")
+    comment = read_queries.get_comment_by_id(comment_id)
 
+    if (username == comment.user_id):
+        write_queries.delete_comment(comment_id)
+        return jsonify(status=True, message="Comment deleted successfully")
+    
+    return jsonify(status=False, message="Unable to delete: user is not the owner of the comment")
 
 @app.route("/api/like_comment", methods=["POST"])
 def like_comment():
