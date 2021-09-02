@@ -35,10 +35,10 @@ def delete_thread():
 
     thread_id = request.form.get('thread_id')
     username = request.form.get('sky_username')
-
+    user_id = read_queries.get_id_from_username(username)
     thread = read_queries.get_thread_by_id(thread_id) 
     
-    if (username == thread.user_id):
+    if (user_id == thread.user_id):
         write_queries.delete_thread(thread_id)
         return jsonify(status=True, message="Successfully deleted thread")
 
@@ -52,9 +52,10 @@ def edit_thread():
 
     thread_id = request.form.get("thread_id")
     username = request.form.get("sky_username")
+    user_id = read_queries.get_id_from_username(username)
     thread = read_queries.get_thread_by_id(thread_id)
 
-    if (username == thread.user_id):
+    if (user_id == thread.user_id):
         new_question_title = request.form.get('title')
         new_question_body = request.form.get('question-body')
         
