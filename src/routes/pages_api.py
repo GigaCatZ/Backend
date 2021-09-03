@@ -8,7 +8,7 @@ from ..database.query import read_queries
 from ..database.update_db import write_queries
 from ..database.models import Thread, Comment
 
-@app.route('/api/search', methods=['POST'])
+@app.route('/search', methods=['POST'])
 def search():
     def filter_by_tags(thread, search_tags):
         return len([tag for tag in thread['tags'] if (tag.lower() == search_tags)]) != 0
@@ -47,7 +47,7 @@ def search():
     return jsonify(search_result=result)
 
 
-@app.route('/api/home', methods=['POST'])
+@app.route('/home', methods=['POST'])
 def homepage():
     order = request.form.get('order')
     threads, status, message = read_queries.get_thread_by_order(order)
@@ -55,7 +55,7 @@ def homepage():
 
 
 # gets top 5 threads by dupes for FAQ page
-@app.route("/api/faq", methods=["GET"])
+@app.route("/faq", methods=["GET"])
 def get_top_threads():
     topFive = []
     queried = read_queries.get_thread_by_dupe()
@@ -77,7 +77,7 @@ def get_top_threads():
     return jsonify(res)
 
 # gets all of the available tags
-@app.route("/api/get_tags", methods=["GET"])
+@app.route("/get_tags", methods=["GET"])
 def send_all_tags():
     queried = read_queries.get_all_tags()
     return jsonify(tags=[{"id": tag.id, "course_id": tag.course_id, "name": tag.name, "count": tag.count} for tag in queried if tag != None])

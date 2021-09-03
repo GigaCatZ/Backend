@@ -16,7 +16,7 @@ login_manager.init_app(app)
 def load_user(user_id):
     return read_queries.get_user_from_id(user_id)
 
-@app.route('/api/checkuser', methods=['POST'])
+@app.route('/checkuser', methods=['POST'])
 def createuser():
     display_name = request.form.get('display_name')
 
@@ -28,14 +28,14 @@ def createuser():
             return jsonify(status=False, message="Display name already taken")
     return jsonify(status=False, message="Api does not get data")
 
-@app.route('/api/whoami', methods=['GET'])
+@app.route('/whoami', methods=['GET'])
 def authenticate():
     if (current_user.is_authenticated):
         return jsonify(is_logged_in=True, display_name=current_user.display_name, sky_username=current_user.sky_username, mod=current_user.mod)
     else:
         return jsonify(is_logged_in=False, display_name="", sky_username="", mod=False)
 
-@app.route('/api/login', methods=['POST'])
+@app.route('/login', methods=['POST'])
 def login():
     username = request.form.get('sky_username')
     password = request.form.get('password')
@@ -56,7 +56,7 @@ def login():
                 return jsonify(username=username, status=True, message="Login successfully")
     return jsonify(username="", status=False, message="Incorrect Username or Password")
 
-@app.route('/api/register', methods=['POST'])
+@app.route('/register', methods=['POST'])
 def register():
     display_name = request.form.get('display_name')
     password = request.form.get('password')
@@ -71,7 +71,7 @@ def register():
             return jsonify(username=username, status=False, message="Username, Display Name, or Email has already been taken")
     return jsonify(username=username, status=False, message="Fields must not be empty")
 
-@app.route('/api/logout', methods=['GET','POST'])
+@app.route('/logout', methods=['GET','POST'])
 def logout():
     if(current_user.is_authenticated):
         user = current_user.sky_username
@@ -81,7 +81,7 @@ def logout():
         return jsonify(status=False, username="", message="User hasnt logged in yet")
 
 
-@app.route("/api/change_info", methods=["POST"])
+@app.route("/change_info", methods=["POST"])
 def update_info():
     username = request.form.get('sky_username')
     password = request.form.get('current_password')
