@@ -7,10 +7,12 @@ from ..database.query import read_queries
 from ..database.update_db import write_queries
 from ..database.models import Thread, Comment
 
-@app.route('/api/getthread', methods=['POST'])
+from .user_security import current_user
+
+@app.route('/api/getthread', methods=['GET'])
 def get_thread_info():
-    thread = read_queries.get_thread_by_id(request.form.get('thread_id'))
-    username = request.form.get('sky_username')
+    thread = read_queries.get_thread_by_id(request.args.get('thread_id'))
+    username = current_user.sky_username
     try:
         return jsonify(status=True, thread_id=thread.id, author=read_queries.get_user_from_id(thread.user_id).display_name, title=thread.question, is_liked=(read_queries.check_thread_like(thread.id, username) is not None),\
             body=thread.body, timestamp=thread.timestamp, likes=thread.likes, comments=read_queries.get_comments_of_thread(thread.id, username), tags=read_queries.get_tags_from_thread(thread.id))
