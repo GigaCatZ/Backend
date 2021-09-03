@@ -30,11 +30,11 @@ class WriteOnly:
 
     def change_user_modval(self, username, modval):
         user = self.read_queries.get_user_from_username(username)
-
-        if (user.mod == modval):
+        if (bool(user.mod) == modval):
             return False
 
         user.mod = modval
+        db.session.commit()
         return True
 
     # Thread attempt begins here

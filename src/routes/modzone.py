@@ -14,7 +14,10 @@ def set_moderator():
         candidate_username = request.form.get("candidate_username")
         candidate = read_queries.get_user_from_username(candidate_username)
         modval = request.form.get("modval") # Intended to be bool
-        
+        if (modval.lower() == "false"):
+            modval = False
+        else:
+            modval = True
         success = write_queries.change_user_modval(candidate_username, modval)
         
         if (success):
