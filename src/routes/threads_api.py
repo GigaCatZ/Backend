@@ -58,6 +58,9 @@ def edit_thread():
     if (user_id == thread.user_id):
         new_question_tags = request.form.get('tags')
         new_question_body = request.form.get('text')
+
+        if new_question_tags == "": new_question_tags = set()
+        else: new_question_tags = set(new_question_tags.split(','))
         
         write_queries.edit_thread(thread_id, new_question_tags, new_question_body)
         return jsonify(status=True, message="Updated thread successfully")

@@ -42,12 +42,19 @@ class WriteOnly:
         
         db.session.commit()
     
-    # TODO: fix this
     def edit_thread(self, thread_id, new_tags, new_body):
         thread = self.read_queries.get_thread_by_id(thread_id) 
 
         # Even if the title or body is unchanged, it'll get "updated" with the old value
-        extra_tags = thread.tags
+        old_tags = set(self.read_queries.get_tags_from_thread(thread_id))
+        tags_to_add = new_tags - old_tags
+        tags_to_remove = old_tags - new_tags
+
+        print("=============\n\n\n\n\n", tags_to_add, "\n\n", tags_to_remove, "\n\n\n\n\n==============")
+
+        self.add_tags_to_thread(thread_id, tags_to_add)
+        self.remove_tags_from_thread(thread_id, tags_to_remove)
+        # tags_to_remove = 
         thread.body = new_body
 
         db.session.commit()
@@ -121,6 +128,14 @@ class WriteOnly:
             db.session.add(TagLine(thread_id=thread_id, tag=tag))
             tag_in_table = Tag.query.filter(Tag.id==tag).first()
             tag_in_table.count += 1
+        db.session.commit()
+
+    def remove_tags_from_thread(self, thread_id, tags):
+        for tag in tags:
+            tag = self.read_queries.tag_lookup(tag.split()[0])
+            db.session.delete(TagLine.query.filter(TagLine.thread_id==thread_id, TagLine.tag==tag).first())
+            tag_in_table = Tag.query.filter(Tag.id==tag).first()
+            tag_in_table.count -= 1
         db.session.commit()
         
     def merge_threads(self, a, b):
