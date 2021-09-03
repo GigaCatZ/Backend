@@ -7,7 +7,7 @@ from ..database.query import read_queries
 from ..database.update_db import write_queries
 
 # COMMENT ATTEMPT BEGINS HERE (I'm just sticking with the format I used earlier, can change if frontend doesn't like it)
-@app.route('/new_comment', methods=['POST'])
+@app.route('/api/new_comment', methods=['POST'])
 def new_comment():
 
     comment_body = request.form.get("comment_body")
@@ -28,7 +28,7 @@ def new_comment():
         return jsonify(status=False, message="Parent comment does not exist", thread_id=None, parent_id=None, comment_id=None, username=None)
 
 
-@app.route('/edit_comment', methods=["POST"])
+@app.route('/api/edit_comment', methods=["POST"])
 def edit_comment():
 
     comment_id = request.form.get("comment_id")
@@ -46,7 +46,7 @@ def edit_comment():
     
     return jsonify(status=False, message="Unable to edit: user is not the owner of the comment")
 
-@app.route("/delete_comment", methods=["POST"])
+@app.route("/api/delete_comment", methods=["POST"])
 def delete_comment():
 
     # Again, defaulting to request.form.get until we have a way to request
@@ -61,7 +61,7 @@ def delete_comment():
     
     return jsonify(status=False, message="Unable to delete: user is not the owner of the comment")
 
-@app.route("/like_comment", methods=["POST"])
+@app.route("/api/like_comment", methods=["POST"])
 def like_comment():
     username = request.form.get('username')
     comment_id = request.form.get('comment_id')

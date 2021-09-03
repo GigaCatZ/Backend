@@ -7,7 +7,7 @@ from ..database.query import read_queries
 from ..database.update_db import write_queries
 from ..database.models import Thread, Comment
 
-@app.route('/getthread', methods=['POST'])
+@app.route('/api/getthread', methods=['POST'])
 def get_thread_info():
     thread = read_queries.get_thread_by_id(request.form.get('thread_id'))
     username = request.form.get('sky_username')
@@ -18,7 +18,7 @@ def get_thread_info():
         return jsonify(status=False, thread_id=None, author=None, title=None, body=None, timestamp=None, likes=None, comments=None, tags=None, is_liked=False)
 
 
-@app.route("/like_thread", methods=["POST"])
+@app.route("/api/like_thread", methods=["POST"])
 def like_thread():
     username = request.form.get('username')
     thread_id = request.form.get('thread_id')
@@ -29,7 +29,7 @@ def like_thread():
     except(AttributeError):
         jsonify(status=False, liked_thread=None, message="Thread does not exist", thread_id=None, new_likes=None, username=None)
 
-@app.route('/deletethread', methods=['POST'])
+@app.route('/api/deletethread', methods=['POST'])
 def delete_thread():
     """ Route/function to delete a thread """ 
 
@@ -46,7 +46,7 @@ def delete_thread():
 
 
 # will test this later once we confirm how frontend gonna do this
-@app.route('/edit_thread', methods=['POST'])
+@app.route('/api/edit_thread', methods=['POST'])
 def edit_thread():
     """ Route/function to edit a thread """
 
@@ -68,7 +68,7 @@ def edit_thread():
     return jsonify(status=False, message="Unable to edit: user does not own the thread")
 
 # will test this later once we confirm how frontend gonna do this
-@app.route('/edit_thread', methods=['GET'])
+@app.route('/api/edit_thread', methods=['GET'])
 def info_for_edit_thread():
     """ What frontenders need to edit thread """
 
@@ -77,12 +77,12 @@ def info_for_edit_thread():
     
     return jsonify(courses=read_queries.display_all_tags(), selected_tags=read_queries.get_tags_from_thread(thread_id), title=thread.question, body=thread.body)
 
-@app.route('/create_thread', methods=['GET'])
+@app.route('/api/create_thread', methods=['GET'])
 def get_all_tags():
     return jsonify(courses=read_queries.display_all_tags())
 
 # Thread attempt begins here
-@app.route('/create_thread', methods=['POST'])
+@app.route('/api/create_thread', methods=['POST'])
 def create_thread():
     """ Route/function to create a new thread """
 

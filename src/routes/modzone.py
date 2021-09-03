@@ -7,13 +7,13 @@ from ..database.models import Thread, Comment, Users
 from ..database.update_db import write_queries
 from ..database.query import read_queries
 
-@app.route("/modzone", methods=['GET'])
+@app.route("/api/modzone", methods=['GET'])
 def get_info_for_mods():
     threads, _, _ = read_queries.get_thread_by_order("SEARCH")
     users = read_queries.get_users()
     return jsonify(threads=threads, users=users)
 
-@app.route("/modzone/set_moderator", methods=["POST"])
+@app.route("/api/modzone/set_moderator", methods=["POST"])
 def set_moderator():
 
     username = request.form.get("sky_username")
@@ -36,7 +36,7 @@ def set_moderator():
 
     return jsonify(status=False, message="Unable to access: current user is not moderator")
 
-@app.route("/modzone/password_change", methods=["POST"])
+@app.route("/api/modzone/password_change", methods=["POST"])
 def password_change():
 
     username = request.form.get("sky_username")
@@ -52,7 +52,7 @@ def password_change():
 
     return jsonify(status=False, message="Unable to access: current user is not moderator")
 
-@app.route("/modzone/add_tag", methods=['POST'])
+@app.route("/api/modzone/add_tag", methods=['POST'])
 def add_tag():
     if not read_queries.get_user_from_username(request.form.get('sky_username')).mod:
         return jsonify(status=False, message="You are not a moderator. You cannot add custom tags.")
@@ -64,7 +64,7 @@ def add_tag():
     return jsonify(status=False, message="This course ID already exists in our existing tags.")
 
 
-@app.route("/modzone/merge_threads", methods=['POST'])
+@app.route("/api/modzone/merge_threads", methods=['POST'])
 def merge_threads():
     if not read_queries.get_user_from_username(request.form.get('sky_username')).mod:
         return jsonify(status=False, message="You are not a moderator. You cannot merge threads.")
