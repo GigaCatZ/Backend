@@ -92,10 +92,8 @@ def create_thread():
     if (question_body == ""):
         question_body = None
 
-    try:
-        tags = tags.split(',')
-    except(AttributeError):
-        tags = []
+    if tags == "": tags = []
+    else: tags = tags.split(',')
 
     thread = write_queries.add_thread(question_title, username, question_body, tags)
     return jsonify(status=True, username=username, thread_id=thread.id, thread_title=thread.question, tags=tags,  message="Thread has been created.")

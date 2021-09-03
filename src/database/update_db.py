@@ -115,8 +115,6 @@ class WriteOnly:
         return True
 
     def add_tags_to_thread(self, thread_id, tags):
-        print("========\n\n\n\n", thread_id, tags ,"\n\n\n\n========")
-
         for tag in tags:
             tag = self.read_queries.tag_lookup(tag.split()[0])
             db.session.add(TagLine(thread_id=thread_id, tag=tag))
