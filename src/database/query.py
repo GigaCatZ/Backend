@@ -63,6 +63,10 @@ class ReadOnly:
             tags.append(f'{tag_info.course_id} | {tag_info.name}')
         return tags
 
+    def get_users(self):
+        queried = Users.query.all()
+        return [{'sky_username' : user.sky_username, 'display_name' : user.display_name, 'mod' : user.mod, 'email' : user.email} for user in queried]
+
     def get_thread_by_order(self, order):
         if order is not None and order in {"RECENT", "LIKES", "POPULAR", "SEARCH"}:
             queried = Thread.query.join(Users, Users.id==Thread.user_id)\
@@ -91,7 +95,8 @@ class ReadOnly:
     def jsonify_thread(self, thread):
         _, thread_id, title, date, likes, display_name = thread
         return {'thread_id':thread_id, 'title':title, 'likes':likes, 'display_name':display_name, 'date':date, \
-            'tags':self.get_courseids_from_thread(thread_id), 'comment_count': self.get_comment_count(thread_id)}
+            'tags':self.get_courseids_from_thread(thread_id), 'comment_count': self.get_comment_count(thread_id), 'reported_as_dupes' : [] }
+            # TODO: edit reported_as_dupes when we implement report dupes feature
 
     def tag_lookup(self, course_id):
         tag = Tag.query.filter(Tag.course_id == course_id).first()

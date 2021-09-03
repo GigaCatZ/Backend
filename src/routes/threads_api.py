@@ -56,13 +56,23 @@ def edit_thread():
     thread = read_queries.get_thread_by_id(thread_id)
 
     if (user_id == thread.user_id):
-        new_question_title = request.form.get('title')
-        new_question_body = request.form.get('question-body')
+        new_question_tags = request.form.get('tags')
+        new_question_body = request.form.get('text')
         
-        write_queries.edit_thread(thread_id, new_question_title, new_question_body)
+        write_queries.edit_thread(thread_id, new_question_tags, new_question_body)
         return jsonify(status=True, message="Updated thread successfully")
     
     return jsonify(status=False, message="Unable to edit: user does not own the thread")
+
+# will test this later once we confirm how frontend gonna do this
+@app.route('/api/edit_thread', methods=['GET'])
+def info_for_edit_thread():
+    """ What frontenders need to edit thread """
+
+    thread_id = request.args.get("thread_id")
+    thread = read_queries.get_thread_by_id(thread_id)
+    
+    return jsonify(courses=read_queries.display_all_tags(), selected_tags=read_queries.get_tags_from_thread(thread_id), title=thread.question, body=thread.body)
 
 @app.route('/api/create_thread', methods=['GET'])
 def get_all_tags():

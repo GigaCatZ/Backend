@@ -4,6 +4,12 @@ from flask import request, jsonify
 from ..database.update_db import write_queries
 from ..database.query import read_queries
 
+@app.route("/api/modzone", methods=['GET'])
+def get_info_for_mods():
+    threads, _, _ = read_queries.get_thread_by_order("SEARCH")
+    users = read_queries.get_users()
+    return jsonify(threads=threads, users=users)
+
 @app.route("/api/modzone/set_moderator", methods=["POST"])
 def set_moderator():
 

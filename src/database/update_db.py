@@ -42,11 +42,12 @@ class WriteOnly:
         
         db.session.commit()
     
-    def edit_thread(self, thread_id, new_title, new_body):
+    # TODO: fix this
+    def edit_thread(self, thread_id, new_tags, new_body):
         thread = self.read_queries.get_thread_by_id(thread_id) 
 
         # Even if the title or body is unchanged, it'll get "updated" with the old value
-        thread.question = new_title
+        extra_tags = thread.tags
         thread.body = new_body
 
         db.session.commit()
