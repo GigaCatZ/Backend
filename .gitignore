@@ -10,5 +10,6 @@
 **/.DS_Store
 __pycache__
 .Makefile.swp
+.env
 # Nawat made this because he is lazy
 run.sh
