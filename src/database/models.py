@@ -66,6 +66,7 @@ class Comment(db.Model):
     likes = db.Column(db.Integer, default=0)
     timestamp = db.Column(db.DateTime)
     main_comment = db.Column(db.Boolean, default=True)
+    deleted = db.Column(db.Boolean, default=False)
 
     # A list of subcomments, not sure if this is gonna work
     subcomments = []
