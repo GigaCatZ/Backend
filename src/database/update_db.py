@@ -22,6 +22,21 @@ class WriteOnly:
             user.encrypted_password = hash_password
         db.session.commit()
 
+    def change_user_password(self, username, new_password):
+        user = self.read_queries.get_user_from_username(username)
+        encrypted_password = bcrypt.hashpw(str.encode(new_password), bcrypt.gensalt(10))
+        user.encrypted_password = encrypted_password
+        db.session.commit()
+
+    def change_user_modval(self, username, modval):
+        user = self.read_queries.get_user_from_username(username)
+
+        if (user.mod == modval):
+            return False
+
+        user.mod = modval
+        return True
+
     # Thread attempt begins here
     def add_thread(self, thread_title, username, thread_body, tags):
         """ Function to create a new thread """ 
