@@ -29,7 +29,7 @@ def like_thread():
     except(AttributeError):
         jsonify(status=False, liked_thread=None, message="Thread does not exist", thread_id=None, new_likes=None, username=None)
 
-@app.route('/api/delete_thread', methods=['GET'])
+@app.route('/api/delete_thread', methods=['POST'])
 def delete_thread():
     """ Route/function to delete a thread """ 
 
