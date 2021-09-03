@@ -14,10 +14,11 @@ def create_app(test_config):
     with app.app_context():
         from .database import initialize_values
         from .routes import comments_api, threads_api, pages_api, user_security, modzone
-        from .handler import errors
 
         db.create_all() # Create database tables if not already there!
 
         return app
 
-
+if __name__ == '__main__':
+	app = create_app(None)
+	app.run(host='0.0.0.0')
