@@ -89,12 +89,9 @@ def update_info():
     display_name = request.form.get('display_name')
     new_password = request.form.get('new_password')
 
-    passwordToByte = password.encode('utf8')
-    encrypted_password = read_queries.get_encrypted_password(username)
-
     if not bcrypt.checkpw(password.encode('utf8'), read_queries.get_encrypted_password(username).encode('utf8')):
         return jsonify(status=False, message="Incorrect password")
-    if read_queries.get_user_from_display_name(display_name).first() is not None:
-        return jsonify(status=False, message="This display name has already been taken")
+    # if read_queries.get_user_from_display_name(display_name).first() is not None:
+    #     return jsonify(status=False, message="This display name has already been taken")
     write_queries.update_user(username, display_name, new_password)
     return jsonify(status=True, message="Successfully updated user information!")
