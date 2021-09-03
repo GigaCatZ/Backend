@@ -26,6 +26,9 @@ class ReadOnly:
     def get_root_comment(self, parent_id):
         comment_line = CommentLine.query.filter(CommentLine.child_comment_id==parent_id).first()
         return comment_line.parent_comment_id if comment_line is not None else parent_id
+
+    def check_tag_existence(self, course_id):
+        return Tag.query.filter(Tag.course_id==course_id).first() is not None
     
     def get_user_from_id(self, user_id):
         return Users.query.get(int(user_id))
@@ -101,6 +104,9 @@ class ReadOnly:
     def get_thread_by_dupe(self):
         return Thread.query.filter(Thread.dupes > 1).order_by(Thread.dupes.desc()).limit(5)
 
+    def filter_all_comments_from_thread(self, thread_id):
+        return Comment.query.filter(Comment.thread_id == thread_id).all()
+
     def get_comments_of_thread(self, thread_id, username):
         queried = Comment.query.filter(Comment.thread_id == thread_id).filter(Comment.main_comment).order_by(Comment.likes.desc()).all()
         return [{'sender': self.get_user_from_id(comment.user_id).display_name, 'timestamp': comment.timestamp, 'body': comment.comment_body, 'is_liked': self.check_comment_like(comment.id, username) is not None, \
@@ -110,6 +116,9 @@ class ReadOnly:
         queried = Comment.query.join(CommentLine, CommentLine.child_comment_id==Comment.id).filter(CommentLine.parent_comment_id == parent_id).all()
         return [{'sender': self.get_user_from_id(comment.user_id).display_name, 'timestamp': comment.timestamp, 'body': comment.comment_body, \
                 'is_liked' : self.check_comment_like(comment.id, username) is not None, 'likes' : comment.likes, 'comment_id' : comment.id , 'reply' : False, 'deleted' : comment.deleted } for comment in queried]
+
+    def users_who_liked_thread(self, thread_id):
+        return ThreadLikes.query.filter(ThreadLikes.thread_id==thread_id).all()
 
     def get_all_tags(self):
         return Tag.query.all()

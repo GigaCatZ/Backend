@@ -68,9 +68,6 @@ class Comment(db.Model):
     main_comment = db.Column(db.Boolean, default=True)
     deleted = db.Column(db.Boolean, default=False)
 
-    # A list of subcomments, not sure if this is gonna work
-    subcomments = []
-
 class CommentLine(db.Model):
     __tablename__ = 'comment_line'
     
