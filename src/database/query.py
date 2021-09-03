@@ -95,7 +95,7 @@ class ReadOnly:
         return tag.id if tag is not None else None
 
     def get_top_comment(self, thread_id):
-        return Comment.query.filter(Comment.thread_id == thread_id).order_by(Comment.likes.desc()).first()
+        return Comment.query.filter(Comment.thread_id == thread_id, main_comment == True).first()
 
     def get_thread_by_dupe(self):
         return Thread.query.filter(Thread.dupes > 1).order_by(Thread.dupes.desc()).limit(5)
