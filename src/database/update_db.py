@@ -64,7 +64,7 @@ class WriteOnly:
     def add_comment(self, thread_id, comment_body, username, parent_id):
         parent_id = self.read_queries.get_root_comment(parent_id)
         comment = Comment(user_id=self.read_queries.get_id_from_username(username), \
-            thread_id=thread_id, comment_body=comment_body, likes=0, main_comment=(parent_id is None), timestamp=datetime.now())
+            thread_id=thread_id, comment_body=comment_body, likes=0, main_comment=(parent_id is None), timestamp=datetime.now(), deleted=False)
         db.session.add(comment)
         db.session.commit()
         if not comment.main_comment:
@@ -80,7 +80,8 @@ class WriteOnly:
 
     def delete_comment(self, comment_id):
         comment = self.read_queries.get_comment_by_id(comment_id)
-
+        # Sayonara da
+        comment.deleted=True
         # Would be nice if frontend could make this italic or something
         comment.comment_body = "This comment has been removed by the user."
         db.session.commit()
