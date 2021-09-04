@@ -1,5 +1,5 @@
 from .models import *
-from datetime import datetime, timezone
+from datetime import datetime
 
 from .query import ReadOnly
 import bcrypt

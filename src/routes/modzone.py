@@ -59,18 +59,22 @@ def add_tag():
 
 @app.route("/api/modzone/merge_threads", methods=['POST'])
 def merge_threads():
-    # if not current_user.is_authenticated or not current_user.mod:
-    #     return jsonify(status=False, message="You are not a moderator. You cannot merge threads.")
+    if not current_user.is_authenticated or not current_user.mod:
+        return jsonify(status=False, message="You are not a moderator. You cannot merge threads.")
     
-    thread_a = int(request.form.get('thread_a'))
-    thread_b = int(request.form.get('thread_b'))
+    thread_a = request.form.get('thread_a')
+    thread_b = request.form.get('thread_b')
+    
+    if thread_a == "" or thread_b == "":
+        return jsonify(status=False, message="You need to select at least one thread")
+    else: thread_a, thread_b = int(thread_a), int(thread_b)
 
     if thread_a == thread_b: # just in case (who knows someone might accidentally merge the same thread with itself)
         return jsonify(status=False, message="Both IDs are the same! You can't merge a thread with itself!!! :(")
 
     if thread_b < thread_a: thread_a, thread_b = thread_b, thread_a
     
-    # if write_queries.merge_threads(thread_a, thread_b):
-    #     return jsonify(status=True, message="Merge successful!")
-    # else:
-    #     return jsonify(status=False, message="At least one thread does not exist!") 
+    if write_queries.merge_threads(thread_a, thread_b):
+        return jsonify(status=True, message="Merge successful!")
+    else:
+        return jsonify(status=False, message="At least one thread does not exist!") 
