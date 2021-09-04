@@ -91,11 +91,14 @@ class ReadOnly:
 
     def get_comment_like_count(self, comment_id):
         return Comment.query.filter(Comment.id==comment_id).first().likes
+
+    def get_readable_day(self, timestamp):
+        return timestamp.strftime('%a, %d %b %Y %H:%M:%S GMT+07:00')
     
     def jsonify_thread(self, thread):
         _, thread_id, title, date, likes, display_name = thread
         print('==============\n\n\n\n\n\n', date, type(date), '\n\n\n\n\n\n\n=================')
-        return {'thread_id':thread_id, 'title':title, 'likes':likes, 'display_name':display_name, 'date': str(date) + "+07:00", \
+        return {'thread_id':thread_id, 'title':title, 'likes':likes, 'display_name':display_name, 'date': self.get_readable_day(date) , \
             'tags':self.get_courseids_from_thread(thread_id), 'comment_count': self.get_comment_count(thread_id), 'reported_as_dupes' : [] }
             # TODO: edit reported_as_dupes when we implement report dupes feature
 
@@ -115,12 +118,12 @@ class ReadOnly:
 
     def get_comments_of_thread(self, thread_id, username):
         queried = Comment.query.filter(Comment.thread_id == thread_id).filter(Comment.main_comment).order_by(Comment.likes.desc()).all()
-        return [{'sender': self.get_user_from_id(comment.user_id).display_name, 'timestamp': str(comment.timestamp)+ "+07:00", 'body': comment.comment_body, 'is_liked': self.check_comment_like(comment.id, username) is not None, \
+        return [{'sender': self.get_user_from_id(comment.user_id).display_name, 'timestamp': self.get_readable_day(comment.timestamp), 'body': comment.comment_body, 'is_liked': self.check_comment_like(comment.id, username) is not None, \
                 'likes' : comment.likes, 'replies' : self.get_all_replies(comment.id, username), 'comment_id' : comment.id , 'reply' : False, 'deleted' : comment.deleted} for comment in queried]
 
     def get_all_replies(self, parent_id, username):
         queried = Comment.query.join(CommentLine, CommentLine.child_comment_id==Comment.id).filter(CommentLine.parent_comment_id == parent_id).all()
-        return [{'sender': self.get_user_from_id(comment.user_id).display_name, 'timestamp': str(comment.timestamp) + "+07:00", 'body': comment.comment_body, \
+        return [{'sender': self.get_user_from_id(comment.user_id).display_name, 'timestamp':self.get_readable_day(comment.timestamp), 'body': comment.comment_body, \
                 'is_liked' : self.check_comment_like(comment.id, username) is not None, 'likes' : comment.likes, 'comment_id' : comment.id , 'reply' : False, 'deleted' : comment.deleted } for comment in queried]
 
     def users_who_liked_thread(self, thread_id):
