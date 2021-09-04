@@ -29,6 +29,7 @@ def like_thread():
         return jsonify(status=True, liked_thread=liked, message=message, thread_id=thread.id, new_likes=thread.likes, username=username)
     except(AttributeError):
         jsonify(status=False, liked_thread=None, message="Thread does not exist", thread_id=None, new_likes=None, username=None)
+    return jsonify(status=False, liked_thread=None, message="No thread ID sent", thread_id=None, new_likes=None, username=None)
 
 @app.route('/api/deletethread', methods=['POST'])
 def delete_thread():

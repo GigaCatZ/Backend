@@ -73,7 +73,7 @@ class ReadOnly:
                 .add_columns(Thread.id, Thread.question, Thread.timestamp, Thread.likes, Users.display_name)
             if order == "RECENT": queried = queried.order_by(Thread.timestamp.desc()).limit(10)
             elif order == "LIKES": queried = queried.order_by(Thread.likes.desc()).limit(10)
-            elif order == "POPULAR": queried.filter(Thread.timestamp >= (datetime.now() - timedelta(days=31))).order_by(Thread.likes.desc()).limit(10)
+            elif order == "POPULAR": queried = queried.filter(Thread.timestamp >= (datetime.now() - timedelta(days=31))).order_by(Thread.likes.desc()).limit(10)
             return [self.jsonify_thread(thread) for thread in queried.all()], True, "Successfully queried the threads"
         else:
             return None, False, "Not valid order"
@@ -97,7 +97,6 @@ class ReadOnly:
     
     def jsonify_thread(self, thread):
         _, thread_id, title, date, likes, display_name = thread
-        print('==============\n\n\n\n\n\n', date, type(date), '\n\n\n\n\n\n\n=================')
         return {'thread_id':thread_id, 'title':title, 'likes':likes, 'display_name':display_name, 'date': self.get_readable_day(date) , \
             'tags':self.get_courseids_from_thread(thread_id), 'comment_count': self.get_comment_count(thread_id), 'reported_as_dupes' : [] }
             # TODO: edit reported_as_dupes when we implement report dupes feature
