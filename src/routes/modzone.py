@@ -1,5 +1,6 @@
 from flask import current_app as app
 from flask import request, jsonify
+from flask_login import current_user
 from ..database.query import read_queries
 from ..database.update_db import write_queries
 from ..database.models import Thread, Comment, Users
@@ -66,7 +67,7 @@ def add_tag():
 
 @app.route("/api/modzone/merge_threads", methods=['POST'])
 def merge_threads():
-    if not read_queries.get_user_from_username(request.form.get('sky_username')).mod:
+    if not current_user.is_authenticated or not current_user.mod:
         return jsonify(status=False, message="You are not a moderator. You cannot merge threads.")
     
     thread_a = request.form.get('thread_a')

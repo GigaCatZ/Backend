@@ -94,6 +94,7 @@ class ReadOnly:
     
     def jsonify_thread(self, thread):
         _, thread_id, title, date, likes, display_name = thread
+        print('==============\n\n\n\n\n\n', date, type(date), '\n\n\n\n\n\n\n=================')
         return {'thread_id':thread_id, 'title':title, 'likes':likes, 'display_name':display_name, 'date':date, \
             'tags':self.get_courseids_from_thread(thread_id), 'comment_count': self.get_comment_count(thread_id), 'reported_as_dupes' : [] }
             # TODO: edit reported_as_dupes when we implement report dupes feature
