@@ -13,3 +13,5 @@ __pycache__
 .env
 # Nawat made this because he is lazy
 run.sh
+*.un~
+**/*.un~
