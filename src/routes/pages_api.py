@@ -26,11 +26,6 @@ def search():
 
     filter_function = filter_by_title
 
-    filter_function = select_filter_function(search_input, type_search)
-    thread_search = read_queries.get_thread_by_order('SEARCH')
-    search_input_lower_case = search_input.lower()
-    result = [thread for thread in thread_search[0] if (filter_function(thread, search_input_lower_case))]
-
     all_types = {'tag': filter_by_tags,'author': filter_by_display_name}
     if (type_search != None or search_input != "" or search_input is not None):
         type_search_lower_case = type_search.lower()
@@ -41,6 +36,11 @@ def search():
                     search_input = search_input.split('|')[0].strip()
                 break;
         del type_search_lower_case
+
+
+    thread_search = read_queries.get_thread_by_order('SEARCH')
+    search_input_lower_case = search_input.lower()
+    result = [thread for thread in thread_search[0] if (filter_function(thread, search_input_lower_case))]
     
     del all_types
     #   delete all objects before return
