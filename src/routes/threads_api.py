@@ -95,16 +95,12 @@ def create_thread():
     username = request.form.get('username') # Need to get userID somehow
     tags = request.form.get('tags')
 
-    if (username == None):
+    if (username == ""):
         return jsonify(status=False, username=None, thread_id=None, title=None, tags=None, message="Couldn't get the username")
 
     # This can probably be handled in frontend but yah
-    if (question_title == None):
+    if (question_title == ""):
         return jsonify(status=False, username=None, thread_id=None, title=None, tags=None,  message="Thread title required.")
-
-    # Perhaps not requiredt
-    if (question_body == ""):
-        question_body = None
 
     if tags == "": tags = []
     else: tags = tags.split(',')
