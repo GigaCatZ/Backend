@@ -3,7 +3,7 @@ from flask import current_app as app
 from flask import request, jsonify
 from sqlalchemy.exc import IntegrityError
 
-from ..database.query import read_queries, get_readable_day
+from ..database.query import read_queries
 from ..database.update_db import write_queries
 from ..database.models import Thread, Comment
 
@@ -17,7 +17,7 @@ def get_thread_info():
         return jsonify(status=False, message="Thread does not exist")
 
     return jsonify(status=True, thread_id=thread.id, author=read_queries.get_user_from_id(thread.user_id).display_name, title=thread.question, is_liked=(read_queries.check_thread_like(thread.id) is not None),\
-        body=thread.body, timestamp=get_readable_day(thread.timestamp), likes=thread.likes, comments=read_queries.get_comments_of_thread(thread.id), tags=read_queries.get_tags_from_thread(thread.id))
+        body=thread.body, timestamp=read_queries.get_readable_day(thread.timestamp), likes=thread.likes, comments=read_queries.get_comments_of_thread(thread.id), tags=read_queries.get_tags_from_thread(thread.id))
 
 @app.route("/api/like_thread", methods=["POST"])
 def like_thread():

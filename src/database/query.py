@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from flask import jsonify
 from flask_login import current_user
     
-class ReadOnly(ReadUsers, ReadThread, ReadComment, ReadTag):
+class ReadOnly:
     def get_readable_day(self, timestamp):
         return timestamp.strftime('%a, %d %b %Y %H:%M:%S GMT+07:00')
     '''
