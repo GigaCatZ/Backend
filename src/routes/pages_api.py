@@ -10,6 +10,15 @@ from ..database.models import Thread, Comment
 
 
 def select_filter_function(type_search, search_input):
+    
+    return filter_function
+
+@app.route('/api/search', methods=['POST'])
+def search():
+
+    search_input = request.form.get('search_input')
+    type_search = request.form.get('type_search')  
+
     def filter_by_tags(thread, search_tags):
         return len([tag for tag in thread['tags'] if (tag.lower() == search_tags)]) != 0
 
@@ -21,6 +30,11 @@ def select_filter_function(type_search, search_input):
         return thread['display_name'] == search_display_name
 
     filter_function = filter_by_title
+
+    filter_function = select_filter_function(search_input, type_search)
+    thread_search = read_queries.get_thread_by_order('SEARCH')
+    search_input_lower_case = search_input.lower()
+    result = [thread for thread in thread_search[0] if (filter_function(thread, search_input_lower_case))]
 
     all_types = {'tag': filter_by_tags,'author': filter_by_display_name}
     if (type_search != None or search_input != "" or search_input is not None):
@@ -34,18 +48,6 @@ def select_filter_function(type_search, search_input):
         del type_search_lower_case
     
     del all_types
-    return filter_function
-
-@app.route('/api/search', methods=['POST'])
-def search():
-
-    search_input = request.form.get('search_input')
-    type_search = request.form.get('type_search')  
-
-    filter_function = select_filter_function(search_input, type_search)
-    thread_search = read_queries.get_thread_by_order('SEARCH')
-    search_input_lower_case = search_input.lower()
-    result = [thread for thread in thread_search[0] if (filter_function(thread, search_input_lower_case))]
     #   delete all objects before return
     del search_input_lower_case
     del search_input
