@@ -8,32 +8,41 @@ from ..database.query import read_queries
 from ..database.update_db import write_queries
 from ..database.models import Thread, Comment
 
-@app.route('/api/search', methods=['POST'])
-def search():
+
+def select_filter_function(type_search, search_input):
     def filter_by_tags(thread, search_tags):
         return len([tag for tag in thread['tags'] if (tag.lower() == search_tags)]) != 0
 
     def filter_by_title(thread, search_title):
-        return thread['title'].lower().startswith(search_title)
+        return set(search_title.split()) - set(thread['title'].lower().split()) == set() or \
+            search_title in thread['title'].lower()
 
     def filter_by_display_name(thread, search_display_name):
         return thread['display_name'] == search_display_name
 
-    search_input = request.form.get('search_input')
-    type_search = request.form.get('type_search')
     filter_function = filter_by_title
 
-    all_types = {'tags': filter_by_tags, 'title': filter_by_title, 'display_name': filter_by_display_name}
-    if (type_search != None):
+    all_types = {'tag': filter_by_tags,'author': filter_by_display_name}
+    if (type_search != None or search_input != "" or search_input is not None):
         type_search_lower_case = type_search.lower()
         for each_type in all_types:
-            if (type_search_lower_case == each_type):
+            if (type_search_lower_case == each_type or search_input != ""):
                 filter_function = all_types[each_type]
-                if (each_type == 'tags'):
+                if (each_type == 'tag'):
                     search_input = search_input.split('|')[0].strip()
                 break;
         del type_search_lower_case
+    
+    del all_types
+    return filter_function
 
+@app.route('/api/search', methods=['POST'])
+def search():
+
+    search_input = request.form.get('search_input')
+    type_search = request.form.get('type_search')  
+
+    filter_function = select_filter_function(search_input, type_search)
     thread_search = read_queries.get_thread_by_order('SEARCH')
     search_input_lower_case = search_input.lower()
     result = [thread for thread in thread_search[0] if (filter_function(thread, search_input_lower_case))]
@@ -41,7 +50,6 @@ def search():
     del search_input_lower_case
     del search_input
     del type_search
-    del all_types
     del thread_search
     del filter_function
     return jsonify(search_result=result)
