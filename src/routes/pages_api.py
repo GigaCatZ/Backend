@@ -8,11 +8,6 @@ from ..database.query import read_queries
 from ..database.update_db import write_queries
 from ..database.models import Thread, Comment
 
-
-def select_filter_function(type_search, search_input):
-    
-    return filter_function
-
 @app.route('/api/search', methods=['POST'])
 def search():
 
