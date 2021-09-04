@@ -16,11 +16,7 @@ def get_info_for_mods():
 
 @app.route("/api/modzone/set_moderator", methods=["POST"])
 def set_moderator():
-
-    username = request.form.get("sky_username")
-    user = read_queries.get_user_from_username(username)
- 
-    if (user.mod):
+    if (current_user.is_authenticated and current_user.mod):
         candidate_username = request.form.get("candidate_username")
         candidate = read_queries.get_user_from_username(candidate_username)
         modval = request.form.get("modval") # Intended to be bool
@@ -39,11 +35,7 @@ def set_moderator():
 
 @app.route("/api/modzone/password_change", methods=["POST"])
 def password_change():
-
-    username = request.form.get("sky_username")
-    user = read_queries.get_user_from_username(username)
-
-    if (user.mod):
+    if (current_user.is_authenticated and current_user.mod):
 
         # Took 20 minutes to think of a name for this T_T
         requested_change_username = request.form.get("requested_change_username")
@@ -55,7 +47,7 @@ def password_change():
 
 @app.route("/api/modzone/add_tag", methods=['POST'])
 def add_tag():
-    if not read_queries.get_user_from_username(request.form.get('sky_username')).mod:
+    if not current_user.is_authenticated or not current_user.mod:
         return jsonify(status=False, message="You are not a moderator. You cannot add custom tags.")
 
     course_id = request.form.get('course_id')
@@ -70,13 +62,13 @@ def merge_threads():
     if not current_user.is_authenticated or not current_user.mod:
         return jsonify(status=False, message="You are not a moderator. You cannot merge threads.")
     
-    thread_a = request.form.get('thread_a')
-    thread_b = request.form.get('thread_b')
+    thread_a = int(request.form.get('thread_a'))
+    thread_b = int(request.form.get('thread_b'))
 
     if thread_a == thread_b: # just in case (who knows someone might accidentally merge the same thread with itself)
         return jsonify(status=False, message="Both IDs are the same! You can't merge a thread with itself!!! :(")
 
-    if int(thread_b) < int(thread_a): thread_a, thread_b = thread_b, thread_a
+    if thread_b < thread_a: thread_a, thread_b = thread_b, thread_a
     
     if write_queries.merge_threads(thread_a, thread_b):
         return jsonify(status=True, message="Merge successful!")
