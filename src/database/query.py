@@ -55,6 +55,7 @@ class ReadComment:
                 'is_liked' : self.check_comment_like(comment.id) is not None, 'likes' : comment.likes, 'comment_id' : comment.id , 'reply' : False, 'deleted' : comment.deleted } for comment in queried]
 
 class ReadOnly(ReadUsers, ReadThread, ReadComment, ReadTag):
-    pass
+    def __init__(self):
+        super().__init__()
 
 read_queries = ReadOnly()
