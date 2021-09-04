@@ -57,5 +57,9 @@ class ReadComment:
 class ReadOnly(ReadUsers, ReadThread, ReadComment, ReadTag):
     def __init__(self):
         super().__init__()
+        self.read_users = ReadUsers()
+        self.read_tag = ReadTag()
+        self.read_comment = ReadComment()
+        self.read_thread = ReadThread()
 
 read_queries = ReadOnly()
