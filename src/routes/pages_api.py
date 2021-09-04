@@ -14,7 +14,7 @@ def search():
         return len([tag for tag in thread['tags'] if (tag.lower() == search_tags)]) != 0
 
     def filter_by_title(thread, search_title):
-        return set(search_input.split()) - set(thread['title'].split()) == 0 or \
+        return set(search_input.split()) - set(thread['title'].split()) == set() or \
             search_title in thread['title'].lower()
 
     def filter_by_display_name(thread, search_display_name):
