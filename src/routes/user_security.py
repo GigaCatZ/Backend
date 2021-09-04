@@ -83,15 +83,17 @@ def logout():
 
 @app.route("/api/change_info", methods=["POST"])
 def update_info():
-    username = request.form.get('sky_username')
+    username = current_user.sky_username
     password = request.form.get('current_password')
 
     display_name = request.form.get('display_name')
     new_password = request.form.get('new_password')
 
-    if not bcrypt.checkpw(password.encode('utf8'), read_queries.get_encrypted_password(username).encode('utf8')):
+    if password is None or not bcrypt.checkpw(password.encode('utf8'), read_queries.get_encrypted_password(username).encode('utf8')):
         return jsonify(status=False, message="Incorrect password")
+    
+    if new_password is None: new_password = ""
     # if read_queries.get_user_from_display_name(display_name).first() is not None:
     #     return jsonify(status=False, message="This display name has already been taken")
-    write_queries.update_user(username, display_name, new_password)
+    write_queries.update_user(display_name, new_password)
     return jsonify(status=True, message="Successfully updated user information!")

@@ -67,9 +67,7 @@ def homepage():
 def get_top_threads():
     topFive = []
     queried = read_queries.get_thread_by_dupe()
-    print("\n\nqueried: ", queried, "\n\n")
     comments = [read_queries.get_top_comment(thread.id) for thread in queried if thread != None]
-    print("\n\ncomments: ", comments, "\n\n")
 
     for thread, comment in zip(queried, comments):
         if comment == None:
