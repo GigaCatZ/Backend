@@ -2,7 +2,7 @@ from .models import *
 from datetime import datetime, timedelta
 
 from flask import jsonify
-from sqlalchemy import func
+from sqlalchemy import and_
 
 class ReadOnly:
     def get_encrypted_password(self, username):
@@ -73,7 +73,7 @@ class ReadOnly:
                 .add_columns(Thread.id, Thread.question, Thread.timestamp, Thread.likes, Users.display_name)
             if order == "RECENT": queried = queried.order_by(Thread.timestamp.desc()).limit(10)
             elif order == "LIKES": queried = queried.order_by(Thread.likes.desc()).limit(10)
-            elif order == "POPULAR": queried = queried.filter(Thread.timestamp >= (datetime.now() - timedelta(days=31))).order_by(Thread.likes.desc()).limit(10)
+            elif order == "POPULAR": queried = queried.filter(Thread.timestamp >= (datetime.now() - timedelta(days=31))).order_by(Thread.likes.desc(), Thread.dupes.desc()).limit(10)
             return [self.jsonify_thread(thread) for thread in queried.all()], True, "Successfully queried the threads"
         else:
             return None, False, "Not valid order"
