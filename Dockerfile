@@ -10,7 +10,7 @@ RUN cd /tmp && pipenv lock --requirements > /usr/src/app/requirements.txt
 RUN pip install -r requirements.txt
 
 # Copy all our source files into the app folder
-COPY . /usr/src/app/
+# COPY . /usr/src/app/
 
 # Tell Docker we're expected to expose port 5000
 EXPOSE 5000
