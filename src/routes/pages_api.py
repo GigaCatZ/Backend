@@ -24,15 +24,15 @@ def search():
     type_search = request.form.get('type_search')
     filter_function = filter_by_title
 
-    all_types = {'tags': filter_by_tags, 'title': filter_by_title, 'display_name': filter_by_display_name}
+    all_types = {'tag': filter_by_tags, 'title': filter_by_title, 'author': filter_by_display_name}
     if (type_search != None):
         type_search_lower_case = type_search.lower()
         for each_type in all_types:
             if (type_search_lower_case == each_type):
                 filter_function = all_types[each_type]
-                if (each_type == 'tags'):
+                if (each_type == 'tag'):
                     search_input = search_input.split('|')[0].strip()
-                break;
+                break
         del type_search_lower_case
 
     thread_search = read_queries.get_thread_by_order('SEARCH')
