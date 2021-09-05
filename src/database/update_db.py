@@ -29,7 +29,6 @@ class UpdateUsers:
             user.encrypted_password = hash_password
             emailer.user_changed_password(current_user.email, current_user.sky_username)
         db.session.commit()
-        return True
 
     def change_user_password(self, username, new_password):
         user = self.read_queries.get_user_from_username(username)
