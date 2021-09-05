@@ -11,6 +11,9 @@ from ..database.models import Thread, Comment
 
 from ..features.email import emailer
 
+from random import choice
+from string import ascii_letters, digits
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 
@@ -104,3 +107,23 @@ def update_info():
         return jsonify(status=True, message="Successfully updated user information!")
     except(IntegrityError):
         return jsonify(status=False, message="Display Name has already been taken")
+
+
+@app.route('/api/new_password', methods=['POST'])
+def forgot_password():
+    def password_generator(size=15, chars=ascii_letters + digits):
+        return ''.join(choice(chars) for _ in range(size))
+    
+    username = request.form.get('sky_username')
+    email = request.form.get('email')
+
+    if username is None or username=="":
+        return jsonify(status=False, response="You need to specify your username!")
+    user = read_queries.get_user_from_username(username)
+    if user is None: return jsonify(status=False, response="There is no account registered with this username")
+    actual_email = user.email
+    if email is None or email=="" or email != actual_email:
+        return jsonify(status=False, response='This is not the email you have registered with for this account!')
+    
+    write_queries.change_user_password(username, password_generator())
+    return jsonify(status=True, response='The request has been sent. Your new password has been sent to you via Email!')
