@@ -9,6 +9,8 @@ from ..database.query import read_queries
 from ..database.update_db import write_queries
 from ..database.models import Thread, Comment
 
+from ..features.email import emailer
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 
@@ -66,6 +68,7 @@ def register():
     if (username is not None and password is not None and display_name is not None):
         try:
             write_queries.register_client(username, display_name, password, email)
+            emailer.registration_success_email(email, username, display_name)
             return jsonify(username=username, status=True, message="Registered successfully!")
         except (IntegrityError):
             return jsonify(username=username, status=False, message="Username, Display Name, or Email has already been taken")
@@ -92,8 +95,12 @@ def update_info():
     if password is None or not bcrypt.checkpw(password.encode('utf8'), read_queries.get_encrypted_password(username).encode('utf8')):
         return jsonify(status=False, message="Incorrect password")
     
-    if new_password is None: new_password = ""
+    # added the or clause so can personalize sending emails ONLY when changes is made
+    if new_password is None or new_password==password: new_password = ""
     # if read_queries.get_user_from_display_name(display_name).first() is not None:
     #     return jsonify(status=False, message="This display name has already been taken")
-    write_queries.update_user(display_name, new_password)
-    return jsonify(status=True, message="Successfully updated user information!")
+    try:
+        write_queries.update_user(display_name, new_password)
+        return jsonify(status=True, message="Successfully updated user information!")
+    except(IntegrityError):
+        return jsonify(status=False, message="Display Name has already been taken")

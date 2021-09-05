@@ -7,6 +7,7 @@ from .query import ReadOnly
 from .update_thread import UpdateThread
 import bcrypt
 
+from ..features.email import emailer
 
 class UpdateUsers:
     def __init__(self):
@@ -21,17 +22,21 @@ class UpdateUsers:
     
     def update_user(self, display_name, password):
         user = self.read_queries.get_user_from_id(current_user.id)
-        if display_name != "": user.display_name=display_name
+        if display_name != "" and user.display_name != display_name: 
+            user.display_name=display_name
         if password != "":
             hash_password = bcrypt.hashpw(str.encode(password), bcrypt.gensalt(10))
             user.encrypted_password = hash_password
+            emailer.user_changed_password(current_user.email, current_user.sky_username)
         db.session.commit()
+        return True
 
     def change_user_password(self, username, new_password):
         user = self.read_queries.get_user_from_username(username)
         encrypted_password = bcrypt.hashpw(str.encode(new_password), bcrypt.gensalt(10))
         user.encrypted_password = encrypted_password
         db.session.commit()
+        emailer.we_changed_users_password(user.email, username, new_password)
 
     def change_user_modval(self, username, modval):
         user = self.read_queries.get_user_from_username(username)
@@ -39,6 +44,7 @@ class UpdateUsers:
             return False
 
         user.mod = modval
+        if modval == True: emailer.notify_new_moderators(user.email, username)
         db.session.commit()
         return True
 

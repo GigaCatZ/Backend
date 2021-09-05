@@ -12,6 +12,7 @@ flask-sqlalchemy = "*"
 python-dotenv = "*"
 sqlalchemy = "*"
 gunicorn = "*"
+requests = "*"
 
 [dev-packages]
 pylint = "*"
