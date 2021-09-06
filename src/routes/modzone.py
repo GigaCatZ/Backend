@@ -18,6 +18,8 @@ def get_info_for_mods():
 def set_moderator():
     if (current_user.is_authenticated and current_user.mod):
         candidate_username = request.form.get("candidate_username")
+        if candidate_username == current_user.sky_username:
+            return jsonify(status=False, message="You cannot remove yourself from moderator!!")
         candidate = read_queries.get_user_from_username(candidate_username)
         modval = request.form.get("modval") # Intended to be bool
         if (modval.lower() == "false"):
