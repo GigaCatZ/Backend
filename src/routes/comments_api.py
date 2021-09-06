@@ -68,9 +68,7 @@ def like_comment():
     comment_id = request.form.get('comment_id')
     
     try:
-        # print("\n\n\n\n\n", comment_id, current_user.id)
         if not current_user.is_authenticated: return jsonify(status=False, liked_comment=False, message="User is not logged in!", comment_id=comment_id, new_likes=read_queries.get_comment_like_count(comment_id), username=None)
-        # print("\n\n\n\n\n", comment_id, current_user.id)
         comment, liked, message = write_queries.upvote_comment(comment_id)
         return jsonify(status=True, liked_comment=liked, message=message, comment_id=comment.id, new_likes=comment.likes, username=current_user.sky_username)
     except(AttributeError):
