@@ -21,7 +21,7 @@ def search():
     filter_function = filter_by_title
 
     all_types = {'tag': filter_by_tags, 'title': filter_by_title, 'author': filter_by_display_name}
-    if (type_search != None):
+    if (type_search is not None or search_input is None or search_input==''):
         type_search_lower_case = type_search.lower()
         for each_type in all_types:
             if (type_search_lower_case == each_type):
