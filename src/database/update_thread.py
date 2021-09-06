@@ -90,8 +90,9 @@ class UpdateThread:
         # move comments in thread b to thread a
         for comment in self.read_queries.filter_all_comments_from_thread(b):
             comment.thread_id = a
-            if not comment.deleted:
-                comment.comment_body = "[This comment has been moved from another thread] \n" + comment.comment_body
+            # this is currently not working atm (need to find a way to display new line)
+            # if not comment.deleted:
+            #     comment.comment_body = "[This comment has been moved from another thread] \n" + comment.comment_body
         
         # combine thread b's likes to thread a
         # likes_a = self.read_queries.users_who_liked_thread(a)
