@@ -103,7 +103,7 @@ class ReadOnly:
     
     def get_top_comment(self, thread_id):
         # Nawat, if you're reading this, filtering by Comment.main_comment was added at the request of PK since this function could return the most upvoted subcomment
-        return Comment.query.filter(Comment.thread_id == thread_id).filter(Comment.main_comment).filter(not Comment.deleted).order_by(Comment.likes.desc()).first()
+        return Comment.query.filter(Comment.thread_id == thread_id, Comment.main_comment, Comment.deleted==0).order_by(Comment.likes.desc()).first()
     
     def get_thread_by_dupe(self):
         return Thread.query.filter(Thread.dupes > 1).order_by(Thread.dupes.desc()).limit(5)
