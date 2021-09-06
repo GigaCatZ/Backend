@@ -1,7 +1,6 @@
 from .models import *
 from datetime import datetime, timedelta
 
-from flask import jsonify
 from flask_login import current_user
     
 class ReadOnly:

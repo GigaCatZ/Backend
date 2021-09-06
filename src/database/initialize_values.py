@@ -1,6 +1,5 @@
 from .models import *
 from sqlalchemy import (event, exc)
-from datetime import datetime
 
 
 @event.listens_for(Tag.__table__, 'after_create')
