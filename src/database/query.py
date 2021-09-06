@@ -45,8 +45,11 @@ class ReadOnly:
     def get_tag_from_id(self, tag_id):
         return Tag.query.filter(Tag.id == tag_id).first()
 
+    def get_tag_from_courseid(self, course_id):
+        return Tag.query.filter(Tag.course_id == course_id).first()
+
     def tag_lookup(self, course_id):
-        tag = Tag.query.filter(Tag.course_id == course_id).first()
+        tag = self.get_tag_from_courseid(course_id)
         return tag.id if tag is not None else None
 
     def get_all_tags(self):

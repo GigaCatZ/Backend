@@ -25,6 +25,9 @@ class UpdateThread:
     # If we allow threads to be deleted (probably not the way to do it)   
     def delete_thread(self, thread_id):
         thread = self.read_queries.get_thread_by_id(thread_id)
+        for tag in self.read_queries.get_tags_from_thread(thread_id):
+            tag = self.read_queries.get_tag_from_courseid(tag.split(' | ')[0])
+            tag.count -= 1
         db.session.delete(thread) # Can we do this?!
         
         db.session.commit()
@@ -87,7 +90,8 @@ class UpdateThread:
         # move comments in thread b to thread a
         for comment in self.read_queries.filter_all_comments_from_thread(b):
             comment.thread_id = a
-            comment.comment_body = "[This comment has been moved from another thread] " + comment.comment_body
+            if not comment.deleted:
+                comment.comment_body = "[This comment has been moved from another thread] \n" + comment.comment_body
         
         # combine thread b's likes to thread a
         # likes_a = self.read_queries.users_who_liked_thread(a)
