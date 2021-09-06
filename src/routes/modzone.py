@@ -3,7 +3,6 @@ from flask import request, jsonify
 from flask_login import current_user
 from ..database.query import read_queries
 from ..database.update_db import write_queries
-from ..database.models import Thread, Comment, Users
 
 from ..database.update_db import write_queries
 from ..database.query import read_queries

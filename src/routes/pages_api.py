@@ -2,11 +2,7 @@
 from flask import current_app as app
 
 from flask import request, jsonify
-from sqlalchemy.exc import IntegrityError
-
 from ..database.query import read_queries
-from ..database.update_db import write_queries
-from ..database.models import Thread, Comment
 
 @app.route('/api/search', methods=['POST'])
 def search():
