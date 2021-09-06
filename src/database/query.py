@@ -81,7 +81,7 @@ class ReadOnly:
             queried = Thread.query.join(Users, Users.id==Thread.user_id)\
                 .add_columns(Thread.id, Thread.question, Thread.timestamp, Thread.likes, Users.display_name)
             if order == "RECENT": queried = queried.order_by(Thread.timestamp.desc()).limit(10)
-            elif order == "LIKES": queried = queried.order_by(Thread.likes.desc()).limit(10)
+            elif order == "LIKES": queried = queried.order_by(Thread.likes.desc(), Thread.timestamp.desc()).limit(10)
             elif order == "POPULAR": queried = queried.filter(Thread.timestamp >= (datetime.now() - timedelta(days=31))).order_by(Thread.likes.desc(), Thread.dupes.desc()).limit(10)
             else: queried = queried.order_by(Thread.likes.desc(), Thread.dupes.desc(), Thread.timestamp.desc())
             return [self.jsonify_thread(thread) for thread in queried.all()], True, "Successfully queried the threads"

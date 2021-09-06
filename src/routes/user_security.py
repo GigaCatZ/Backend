@@ -118,12 +118,12 @@ def forgot_password():
     email = request.form.get('email')
 
     if username is None or username=="":
-        return jsonify(status=False, response="You need to specify your username!")
+        return jsonify(status=False, message="You need to specify your username!")
     user = read_queries.get_user_from_username(username)
-    if user is None: return jsonify(status=False, response="There is no account registered with this username")
+    if user is None: return jsonify(status=False, message="There is no account registered with this username")
     actual_email = user.email
     if email is None or email=="" or email != actual_email:
-        return jsonify(status=False, response='This is not the email you have registered with for this account!')
+        return jsonify(status=False, message='This is not the email you have registered with for this account!')
     
     write_queries.change_user_password(username, password_generator())
-    return jsonify(status=True, response='The request has been sent. Your new password has been sent to you via Email!')
+    return jsonify(status=True, message='The request has been sent. Your new password has been sent to you via Email! If you don\'t see any email, please check your spam folder.')
