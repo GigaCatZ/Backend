@@ -55,7 +55,7 @@ class UpdateComment:
     def add_comment(self, thread_id, comment_body, parent_id):
         parent_id = self.read_queries.get_root_comment(parent_id)
         comment = Comment(user_id=current_user.id, thread_id=thread_id, comment_body=comment_body, likes=0, \
-            main_comment=(parent_id is None), timestamp=datetime.now(), deleted=False, edited=False)
+            main_comment=(parent_id is None), timestamp=datetime.now(), deleted=False)
         db.session.add(comment)
         db.session.commit()
         if not comment.main_comment:
@@ -66,7 +66,6 @@ class UpdateComment:
     def edit_comment(self, comment_id, new_comment_body):
         comment = self.read_queries.get_comment_by_id(comment_id)
         comment.comment_body = new_comment_body
-        comment.edited = True
         db.session.commit()
 
     def delete_comment(self, comment_id):
