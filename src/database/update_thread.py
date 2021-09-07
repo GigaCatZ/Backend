@@ -22,14 +22,16 @@ class UpdateThread:
         self.add_tags_to_thread(thread.id, tags)
         return thread
 
+    def remove_tag_count(self, tags):
+        for tag in tags:
+            tag = self.read_queries.get_tag_from_courseid(tag.split(' | ')[0])
+            tag.count -= 1
+
     # If we allow threads to be deleted (probably not the way to do it)   
     def delete_thread(self, thread_id):
         thread = self.read_queries.get_thread_by_id(thread_id)
-        for tag in self.read_queries.get_tags_from_thread(thread_id):
-            tag = self.read_queries.get_tag_from_courseid(tag.split(' | ')[0])
-            tag.count -= 1
+        self.remove_tag_countself.read_queries.get_tags_from_thread(thread_id)()
         db.session.delete(thread) # Can we do this?!
-        
         db.session.commit()
     
     def edit_thread(self, thread_id, new_tags, new_body):
@@ -83,9 +85,17 @@ class UpdateThread:
         thread_b = self.read_queries.get_thread_by_id(b)
         if thread_b == None or thread_a == None: return False
 
-        # move all extra tags in thread_b to thread_a
-        additional_tags = set(self.read_queries.get_tags_from_thread(b)) - set(self.read_queries.get_tags_from_thread(a))
-        self.add_tags_to_thread(a, additional_tags)
+        
+        tags_a = set(self.read_queries.get_tags_from_thread(a))
+        tags_b = set(self.read_queries.get_tags_from_thread(b))
+
+        for tag in tags_a & tags_b:
+            stag = self.read_queries.get_tag_from_courseid(tag.split(' | ')[0])
+            tag.count -= 1
+
+        # move all extra tags in thread_b to thread_a and decrement count if intersect
+        self.remove_tag_count(tags_a & tags_b)
+        self.add_tags_to_thread(a, tags_b - tags_a)
 
         # move comments in thread b to thread a
         for comment in self.read_queries.filter_all_comments_from_thread(b):
