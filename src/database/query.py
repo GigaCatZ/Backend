@@ -133,12 +133,12 @@ class ReadOnly:
     def get_comments_of_thread(self, thread_id):
         queried = Comment.query.filter(Comment.thread_id == thread_id).filter(Comment.main_comment).order_by(Comment.likes.desc()).all()
         return [{'sender': self.get_user_from_id(comment.user_id).display_name, 'timestamp': self.get_readable_day(comment.timestamp), 'body': comment.comment_body, 'is_liked': self.check_comment_like(comment.id) is not None, \
-                'likes' : comment.likes, 'replies' : self.get_all_replies(comment.id), 'comment_id' : comment.id , 'reply' : False, 'deleted' : comment.deleted} for comment in queried]
+                'likes' : comment.likes, 'replies' : self.get_all_replies(comment.id), 'comment_id' : comment.id , 'reply' : False, 'deleted' : comment.deleted, 'edit_box': False } for comment in queried]
 
     def get_all_replies(self, parent_id):
         queried = Comment.query.join(CommentLine, CommentLine.child_comment_id==Comment.id).filter(CommentLine.parent_comment_id == parent_id).order_by(Comment.timestamp).all()
         return [{'sender': self.get_user_from_id(comment.user_id).display_name, 'timestamp': self.get_readable_day(comment.timestamp), 'body': comment.comment_body, \
-                'is_liked' : self.check_comment_like(comment.id) is not None, 'likes' : comment.likes, 'comment_id' : comment.id , 'reply' : False, 'deleted' : comment.deleted } for comment in queried]
+                'is_liked' : self.check_comment_like(comment.id) is not None, 'likes' : comment.likes, 'comment_id' : comment.id , 'reply' : False, 'deleted' : comment.deleted , 'edit_box': False} for comment in queried]
 
     
 read_queries = ReadOnly()

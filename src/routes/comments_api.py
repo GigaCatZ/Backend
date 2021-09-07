@@ -61,7 +61,7 @@ def delete_comment():
         write_queries.delete_comment(comment_id)
         return jsonify(status=True, message="Comment deleted successfully")
     
-    return jsonify(status=False, message="Unable to delete: user is not the owner of the comment")
+    return jsonify(status=False, message="Unable to delete: usergi is not the owner of the comment")
 
 @app.route("/api/like_comment", methods=["POST"])
 def like_comment():
