@@ -67,8 +67,8 @@ def register():
     username = request.form.get('sky_username')
     email = request.form.get('email')
 
-    if (username != "" and password != "" and display_name != "" and \
-        username is not None and password is not None and display_name is not None):
+    if (username != "" and password != "" and display_name != "" and email != "" and \
+        username is not None and password is not None and display_name is not None and email is not None):
         try:
             write_queries.register_client(username, display_name, password, email)
             emailer.registration_success_email(email, username, display_name)
