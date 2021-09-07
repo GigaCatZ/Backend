@@ -81,8 +81,8 @@ class ReadOnly:
                 .add_columns(Thread.id, Thread.question, Thread.timestamp, Thread.likes, Users.display_name)
             if order == "RECENT": queried = queried.order_by(Thread.timestamp.desc()).limit(10)
             elif order == "LIKES": queried = queried.order_by(Thread.likes.desc(), Thread.timestamp.desc()).limit(10)
-            elif order == "POPULAR": queried = queried.filter(Thread.timestamp >= (datetime.now() - timedelta(days=31))).order_by(Thread.likes.desc(), Thread.dupes.desc()).limit(10)
-            else: queried = queried.order_by(Thread.likes.desc(), Thread.dupes.desc(), Thread.timestamp.desc())
+            elif order == "POPULAR": queried = queried.filter(Thread.timestamp >= (datetime.now() - timedelta(days=31))).order_by(Thread.likes.desc(), Thread.dupes.desc(), Thread.id.desc()).limit(10)
+            else: queried = queried.order_by(Thread.likes.desc(), Thread.dupes.desc(), Thread.id.desc())
             return [self.jsonify_thread(thread) for thread in queried.all()], True, "Successfully queried the threads"
         else:
             return None, False, "Not valid order"
@@ -136,7 +136,7 @@ class ReadOnly:
                 'likes' : comment.likes, 'replies' : self.get_all_replies(comment.id), 'comment_id' : comment.id , 'reply' : False, 'deleted' : comment.deleted} for comment in queried]
 
     def get_all_replies(self, parent_id):
-        queried = Comment.query.join(CommentLine, CommentLine.child_comment_id==Comment.id).filter(CommentLine.parent_comment_id == parent_id).all()
+        queried = Comment.query.join(CommentLine, CommentLine.child_comment_id==Comment.id).filter(CommentLine.parent_comment_id == parent_id).order_by(Comment.timestamp).all()
         return [{'sender': self.get_user_from_id(comment.user_id).display_name, 'timestamp': self.get_readable_day(comment.timestamp), 'body': comment.comment_body, \
                 'is_liked' : self.check_comment_like(comment.id) is not None, 'likes' : comment.likes, 'comment_id' : comment.id , 'reply' : False, 'deleted' : comment.deleted } for comment in queried]
 
