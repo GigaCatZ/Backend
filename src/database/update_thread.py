@@ -30,7 +30,7 @@ class UpdateThread:
     # If we allow threads to be deleted (probably not the way to do it)   
     def delete_thread(self, thread_id):
         thread = self.read_queries.get_thread_by_id(thread_id)
-        self.remove_tag_countself.read_queries.get_tags_from_thread(thread_id)()
+        self.remove_tag_count(self.read_queries.get_tags_from_thread(thread_id))
         db.session.delete(thread) # Can we do this?!
         db.session.commit()
     
