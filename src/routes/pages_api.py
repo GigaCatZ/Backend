@@ -14,7 +14,7 @@ def search():
             search_title in thread['title'].lower()
 
     def filter_by_display_name(thread, search_display_name):
-        return thread['display_name'].lower() == search_display_name
+        return search_display_name in thread['display_name'].lower()
 
     search_input = request.form.get('search_input')
     type_search = request.form.get('type_search')
