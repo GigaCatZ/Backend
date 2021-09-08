@@ -101,7 +101,7 @@ def create_thread():
         return jsonify(status=False, username=None, thread_id=None, title=None, tags=None, message="Couldn't get the username")
 
     # This can probably be handled in frontend but yah
-    if (question_title/strip() == ""):
+    if (question_title.strip() == ""):
         return jsonify(status=False, username=None, thread_id=None, title=None, tags=None,  message="Thread title required.")
 
     if tags == "": tags = []
