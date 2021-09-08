@@ -10,7 +10,7 @@ from ..database.query import read_queries
 @app.route("/api/modzone", methods=['GET'])
 def get_info_for_mods():
     if not current_user.is_authenticated or not current_user.mod:
-        return redirect("/modzone/access")
+        return redirect("https://iccourses.cs.muzoo.io/modzone/access")
     threads, _, _ = read_queries.get_thread_by_order("SEARCH")
     users = read_queries.get_users()
     return jsonify(threads=threads, users=users)
