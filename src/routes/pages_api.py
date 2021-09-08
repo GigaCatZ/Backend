@@ -7,6 +7,7 @@ from ..database.query import read_queries
 @app.route('/api/search', methods=['POST'])
 def search():
     def filter_by_tags(thread, search_tags):
+        print('\n\n\n\n\n\n', search_tags, '\n\n\n\n\n\n')
         return len([tag for tag in thread['tags'] if (tag.lower() == search_tags)]) != 0
 
     def filter_by_title(thread, search_title):
@@ -21,7 +22,7 @@ def search():
     filter_function = filter_by_title
 
     all_types = {'tag': filter_by_tags, 'author': filter_by_display_name}
-    if (type_search is not None and search_input is not None and search_input != '' and search_input == 'null'):
+    if (type_search is not None and search_input is not None and search_input != ''):
         type_search_lower_case = type_search.lower()
         for each_type in all_types:
             if (type_search_lower_case == each_type):
