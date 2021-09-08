@@ -1,5 +1,5 @@
 from flask import current_app as app
-from flask import request, jsonify
+from flask import request, jsonify, redirect
 from flask_login import current_user
 from ..database.query import read_queries
 from ..database.update_db import write_queries
@@ -9,6 +9,8 @@ from ..database.query import read_queries
 
 @app.route("/api/modzone", methods=['GET'])
 def get_info_for_mods():
+    if not current_user.is_authenticated or not current_user.mod:
+        return redirect("/modzone/access")
     threads, _, _ = read_queries.get_thread_by_order("SEARCH")
     users = read_queries.get_users()
     return jsonify(threads=threads, users=users)
