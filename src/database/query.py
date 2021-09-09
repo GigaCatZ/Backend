@@ -36,7 +36,7 @@ class ReadOnly:
         return [f'{course.course_id} | {course.name}' for course in queried]
 
     def display_all_tags(self):
-        return self.display_tags(Tag.query)
+        return self.display_tags(Tag.query.order_by(Tag.course_id))
 
     def display_top_tags(self):
         return self.display_tags(Tag.query.order_by(Tag.count.desc()).limit(10))
