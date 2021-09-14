@@ -20,7 +20,7 @@ class UpdateThread:
         db.session.add(thread)
         db.session.commit() # commit in case of one-to-many relationship foreign key
         
-        self.add_tags_to_thread(thread.id, tags)
+        self.add_tags_to_thread(thread.id, set(tags) - {None})
         return thread
 
     def remove_tag_count(self, tags):
@@ -40,14 +40,13 @@ class UpdateThread:
 
         # Even if the title or body is unchanged, it'll get "updated" with the old value
         old_tags = set(self.read_queries.get_tags_from_thread(thread_id))
-        tags_to_add = new_tags - old_tags
-        tags_to_remove = old_tags - new_tags
+        tags_to_add = new_tags - old_tags - {None}
+        tags_to_remove = old_tags - new_tags - {None}
 
         self.add_tags_to_thread(thread_id, tags_to_add)
         self.remove_tags_from_thread(thread_id, tags_to_remove)
         # tags_to_remove = 
         thread.body = new_body
-
         db.session.commit()
         
     def upvote_thread(self, thread_id):
