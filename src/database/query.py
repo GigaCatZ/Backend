@@ -2,6 +2,7 @@ from .models import *
 from datetime import datetime, timedelta
 
 from flask_login import current_user
+from sqlalchemy.exc import IntegrityError
     
 class ReadOnly:
     def get_readable_day(self, timestamp):
@@ -45,7 +46,8 @@ class ReadOnly:
         return Tag.query.filter(Tag.id == tag_id).first()
 
     def get_tag_from_courseid(self, course_id):
-        return Tag.query.filter(Tag.course_id == course_id).first()
+        try: return Tag.query.filter(Tag.course_id == course_id).first()
+        except(IntegrityError): return None
 
     def tag_lookup(self, course_id):
         tag = self.get_tag_from_courseid(course_id)
