@@ -72,9 +72,9 @@ class UpdateThread:
                 db.session.add(TagLine(thread_id=thread_id, tag=tag))
                 tag_in_table = Tag.query.filter(Tag.id==tag).first()
                 tag_in_table.count += 1
+                db.session.commit()
             except(IntegrityError):
                 continue
-        db.session.commit()
 
     def remove_tags_from_thread(self, thread_id, tags):
         for tag in tags:
@@ -83,9 +83,9 @@ class UpdateThread:
                 db.session.delete(TagLine.query.filter(TagLine.thread_id==thread_id, TagLine.tag==tag).first())
                 tag_in_table = Tag.query.filter(Tag.id==tag).first()
                 tag_in_table.count -= 1
+                db.session.commit()
             except(IntegrityError):
                 continue
-        db.session.commit()
         
     def merge_threads(self, a, b):
         thread_a = self.read_queries.get_thread_by_id(a)
