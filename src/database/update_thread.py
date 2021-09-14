@@ -4,6 +4,7 @@ from .query import ReadOnly
 from flask_login import current_user
 
 from datetime import datetime
+from sqlalchemy.exc import IntegrityError
 
 class UpdateThread:
     def __init__(self):
@@ -66,18 +67,24 @@ class UpdateThread:
 
     def add_tags_to_thread(self, thread_id, tags):
         for tag in tags:
-            tag = self.read_queries.tag_lookup(tag.split()[0])
-            db.session.add(TagLine(thread_id=thread_id, tag=tag))
-            tag_in_table = Tag.query.filter(Tag.id==tag).first()
-            tag_in_table.count += 1
+            try:
+                tag = self.read_queries.tag_lookup(tag.split()[0])
+                db.session.add(TagLine(thread_id=thread_id, tag=tag))
+                tag_in_table = Tag.query.filter(Tag.id==tag).first()
+                tag_in_table.count += 1
+            except(IntegrityError):
+                continue
         db.session.commit()
 
     def remove_tags_from_thread(self, thread_id, tags):
         for tag in tags:
-            tag = self.read_queries.tag_lookup(tag.split()[0])
-            db.session.delete(TagLine.query.filter(TagLine.thread_id==thread_id, TagLine.tag==tag).first())
-            tag_in_table = Tag.query.filter(Tag.id==tag).first()
-            tag_in_table.count -= 1
+            try:
+                tag = self.read_queries.tag_lookup(tag.split()[0])
+                db.session.delete(TagLine.query.filter(TagLine.thread_id==thread_id, TagLine.tag==tag).first())
+                tag_in_table = Tag.query.filter(Tag.id==tag).first()
+                tag_in_table.count -= 1
+            except(IntegrityError):
+                continue
         db.session.commit()
         
     def merge_threads(self, a, b):
