@@ -92,7 +92,7 @@ class UpdateThread:
         tags_b = set(self.read_queries.get_tags_from_thread(b))
 
         for tag in tags_a & tags_b:
-            stag = self.read_queries.get_tag_from_courseid(tag.split(' | ')[0])
+            tag = self.read_queries.get_tag_from_courseid(tag.split(' | ')[0])
             tag.count -= 1
 
         # move all extra tags in thread_b to thread_a and decrement count if intersect
