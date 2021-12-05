@@ -1,7 +1,8 @@
-from .. import db  # db comes from __init__.py
 from flask_login import UserMixin
-
 from sqlalchemy.orm import backref
+
+from .. import db  # db comes from __init__.py
+
 
 class Users(UserMixin, db.Model):
     """DUMMY Data model for Users"""
@@ -68,9 +69,10 @@ class Comment(db.Model):
     main_comment = db.Column(db.Boolean, default=True)
     deleted = db.Column(db.Boolean, default=False)
 
+
 class CommentLine(db.Model):
     __tablename__ = 'comment_line'
-    
+
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     parent_comment_id = db.Column(db.Integer, db.ForeignKey('comment.id', ondelete='CASCADE'), nullable=False)
     child_comment_id = db.Column(db.Integer, db.ForeignKey('comment.id', ondelete='CASCADE'), nullable=False)

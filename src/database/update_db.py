@@ -1,29 +1,31 @@
-from .models import *
 from datetime import datetime
 
+import bcrypt
 from flask_login import current_user
 
+from .models import *
 from .query import ReadOnly
 from .update_thread import UpdateThread
-import bcrypt
-
 from ..features.email import emailer
+
 
 class UpdateUsers:
     def __init__(self):
         self.read_queries = ReadOnly()
-    
-    def register_client(self,sky_username, display_name, password, email):
+
+    def register_client(self, sky_username, display_name, password, email):
 
         passwordToByte = str.encode(password)
         hash_password = bcrypt.hashpw(passwordToByte, bcrypt.gensalt(10))
-        db.session.add(Users(sky_username=sky_username, display_name=display_name, mod=False, encrypted_password=hash_password, email=email))
+        db.session.add(
+            Users(sky_username=sky_username, display_name=display_name, mod=False, encrypted_password=hash_password,
+                  email=email))
         db.session.commit()
-    
+
     def update_user(self, display_name, password):
         user = self.read_queries.get_user_from_id(current_user.id)
-        if display_name != "" and user.display_name != display_name: 
-            user.display_name=display_name
+        if display_name != "" and user.display_name != display_name:
+            user.display_name = display_name
         if password != "":
             hash_password = bcrypt.hashpw(str.encode(password), bcrypt.gensalt(10))
             user.encrypted_password = hash_password
@@ -47,6 +49,7 @@ class UpdateUsers:
         db.session.commit()
         return True
 
+
 class UpdateComment:
     def __init__(self):
         self.read_queries = ReadOnly()
@@ -55,7 +58,7 @@ class UpdateComment:
     def add_comment(self, thread_id, comment_body, parent_id):
         parent_id = self.read_queries.get_root_comment(parent_id)
         comment = Comment(user_id=current_user.id, thread_id=thread_id, comment_body=comment_body, likes=0, \
-            main_comment=(parent_id is None), timestamp=datetime.now(), deleted=False)
+                          main_comment=(parent_id is None), timestamp=datetime.now(), deleted=False)
         db.session.add(comment)
         db.session.commit()
         if not comment.main_comment:
@@ -71,7 +74,7 @@ class UpdateComment:
     def delete_comment(self, comment_id):
         comment = self.read_queries.get_comment_by_id(comment_id)
         # Sayonara da
-        comment.deleted=True
+        comment.deleted = True
         # Would be nice if frontend could make this italic or something
         comment.comment_body = "This comment has been removed by the user."
         db.session.commit()
@@ -79,7 +82,7 @@ class UpdateComment:
     def upvote_comment(self, comment_id):
         comment = self.read_queries.get_comment_by_id(comment_id)
         liked_comment = self.read_queries.check_comment_like(comment_id)
-    
+
         if (liked_comment is None):
             comment.likes += 1
             db.session.add(CommentLikes(comment_id=comment_id, user_id=current_user.id))

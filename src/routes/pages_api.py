@@ -1,8 +1,8 @@
-
 from flask import current_app as app
-
 from flask import request, jsonify
+
 from ..database.query import read_queries
+
 
 @app.route('/api/search', methods=['POST'])
 def search():
@@ -12,7 +12,7 @@ def search():
 
     def filter_by_title(thread, search_title):
         return set(search_input.split()) - set(thread['title'].split()) == set() or \
-            search_title in thread['title'].lower()
+               search_title in thread['title'].lower()
 
     def filter_by_display_name(thread, search_display_name):
         return search_display_name in thread['display_name'].lower()
@@ -72,8 +72,11 @@ def get_top_threads():
     res = {"response": topFive}
     return jsonify(res)
 
+
 # gets all of the available tags
 @app.route("/api/get_tags", methods=["GET"])
 def send_all_tags():
     queried = read_queries.get_all_tags()
-    return jsonify(tags=[{"id": tag.id, "course_id": tag.course_id, "name": tag.name, "count": tag.count} for tag in queried if tag != None])
+    return jsonify(
+        tags=[{"id": tag.id, "course_id": tag.course_id, "name": tag.name, "count": tag.count} for tag in queried if
+              tag != None])
