@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 
 from flask_login import current_user
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import or_
 
 from .models import *
 
@@ -97,8 +98,11 @@ class ReadOnly:
             elif order == "LIKES":
                 queried = queried.order_by(Thread.likes.desc(), Thread.timestamp.desc()).limit(10)
             elif order == "POPULAR":
-                queried = queried.filter(Thread.timestamp >= (datetime.now() - timedelta(days=31))).order_by(
-                    Thread.likes.desc(), Thread.dupes.desc(), Thread.id.desc()).limit(10)
+                queried = queried.outerjoin(Comment, Comment.thread_id == Thread.id) \
+                    .order_by(Thread.likes.desc(), Thread.dupes.desc(), Comment.timestamp.desc(),
+                              Thread.id.desc(),Comment.thread_id, Comment.timestamp.desc()).distinct(Comment.thread_id) \
+                    .filter(or_((Comment.timestamp >= (datetime.now() - timedelta(days=31))),
+                                (Thread.timestamp >= (datetime.now() - timedelta(days=31))))).limit(10)
             else:
                 queried = queried.order_by(Thread.likes.desc(), Thread.dupes.desc(), Thread.id.desc())
             return [self.jsonify_thread(thread) for thread in queried.all()], True, "Successfully queried the threads"
