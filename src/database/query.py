@@ -100,9 +100,9 @@ class ReadOnly:
             elif order == "POPULAR":
                 queried = queried.outerjoin(Comment, Comment.thread_id == Thread.id) \
                     .order_by(Thread.likes.desc(), Thread.dupes.desc(), Comment.timestamp.desc(),
-                              Thread.id.desc(),Comment.thread_id, Comment.timestamp.desc()).distinct(Comment.thread_id) \
-                    .filter(or_((Comment.timestamp >= (datetime.now() - timedelta(days=31))),
-                                (Thread.timestamp >= (datetime.now() - timedelta(days=31))))).limit(10)
+                              Thread.id.desc()).distinct(Comment.thread_id) \
+                    .filter(or_((Comment.timestamp >= (datetime.now() - timedelta(days=128))),
+                                (Thread.timestamp >= (datetime.now() - timedelta(days=128))))).limit(10)
             else:
                 queried = queried.order_by(Thread.likes.desc(), Thread.dupes.desc(), Thread.id.desc())
             return [self.jsonify_thread(thread) for thread in queried.all()], True, "Successfully queried the threads"
