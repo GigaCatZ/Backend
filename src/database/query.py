@@ -99,7 +99,7 @@ class ReadOnly:
                 queried = queried.order_by(Thread.likes.desc(), Thread.timestamp.desc()).limit(10)
             elif order == "POPULAR":
                 queried = queried.outerjoin(Comment, Comment.thread_id == Thread.id) \
-                    .order_by(Thread.likes.desc(), Thread.dupes.desc(), Comment.timestamp.desc(),
+                    .order_by(Thread.dupes.desc(), Thread.likes.desc(), Comment.timestamp.desc(),
                               Thread.id.desc()).distinct(Comment.thread_id) \
                     .filter(or_((Comment.timestamp >= (datetime.now() - timedelta(days=128))),
                                 (Thread.timestamp >= (datetime.now() - timedelta(days=128))))).limit(10)
